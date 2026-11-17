@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wetlab-isaaclab"
+version = "0.1.0"
+description = "Isaac Lab mobile-manipulation environments for the HTR wet-lab workflow"
+requires-python = ">=3.11"
+dependencies = ["numpy", "opencv-python", "scipy>=1.11"]
+
+[tool.setuptools.packages.find]
+where = ["source"]

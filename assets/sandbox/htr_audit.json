@@ -1,0 +1,125 @@
+{
+  "basket": {
+    "source": "HTR_Bottom_Basket.stp",
+    "cad_dimensions_m": [
+      0.19200000539422035,
+      0.12309999950230122,
+      0.04580000136047602
+    ],
+    "mass_kg": 4.3,
+    "pdf_dimensions_m": [
+      0.1975,
+      0.123,
+      0.046
+    ],
+    "mass_estimated": false,
+    "estimated_contact_parameters": {
+      "contact_offset_m": 0.0001,
+      "rest_offset_m": 0.0,
+      "max_depenetration_velocity_m_s": 0.02,
+      "linear_damping_per_s": 1.0,
+      "angular_damping_per_s": 1.0
+    },
+    "cad_minus_pdf_m": [
+      -0.005499994605779657,
+      9.99995023012179e-05,
+      -0.00019999863952398222
+    ]
+  },
+  "well": {
+    "source": "HTR_Well.stp",
+    "cad_dimensions_m": [
+      0.12800000607967377,
+      0.08500000089406967,
+      0.02800000086426735
+    ],
+    "mass_kg": 0.76,
+    "pdf_dimensions_m": [
+      0.128,
+      0.085,
+      0.028
+    ],
+    "mass_estimated": false,
+    "estimated_contact_parameters": {
+      "contact_offset_m": 2e-05,
+      "rest_offset_m": 0.0,
+      "max_depenetration_velocity_m_s": 0.02,
+      "linear_damping_per_s": 1.0,
+      "angular_damping_per_s": 1.0
+    },
+    "cad_minus_pdf_m": [
+      6.0796737644253085e-09,
+      8.940696655246327e-10,
+      8.64267348660297e-10
+    ]
+  },
+  "insert": {
+    "source": "HTR_Insert.stp",
+    "cad_dimensions_m": [
+      0.019750000908970833,
+      0.019743718206882477,
+      0.023099999874830246
+    ],
+    "mass_kg": 0.01043,
+    "pdf_dimensions_m": null,
+    "mass_estimated": true,
+    "fit_note": "Nominal insert and bore are both 19.75 mm. Clearance mode retains CAD visuals and uses an estimated 19.55 mm collider; measure real clearance before calibration.",
+    "collision_mode": "clearance",
+    "visual_diameter_mm": 19.75,
+    "collision_diameter_mm": 19.55,
+    "collision_clearance_estimated": true,
+    "estimated_contact_parameters": {
+      "contact_offset_m": 2e-05,
+      "rest_offset_m": 0.0,
+      "max_depenetration_velocity_m_s": 0.02,
+      "linear_damping_per_s": 1.0,
+      "angular_damping_per_s": 1.0
+    }
+  },
+  "cover": {
+    "source": "HTR_Cover.stp",
+    "cad_dimensions_m": [
+      0.19200000166893005,
+      0.12309999763965607,
+      0.03555000014603138
+    ],
+    "mass_kg": 1.9,
+    "pdf_dimensions_m": [
+      0.1975,
+      0.123,
+      0.026
+    ],
+    "mass_estimated": false,
+    "dimension_note": "Bounding height includes underside bosses; preserve CAD rather than rescale to PDF plate thickness.",
+    "estimated_contact_parameters": {
+      "contact_offset_m": 0.0001,
+      "rest_offset_m": 0.0,
+      "max_depenetration_velocity_m_s": 0.02,
+      "linear_damping_per_s": 1.0,
+      "angular_damping_per_s": 1.0
+    },
+    "cad_minus_pdf_m": [
+      -0.005499998331069955,
+      9.999763965606867e-05,
+      0.009550000146031381
+    ]
+  },
+  "disassembly_plate": {
+    "source": "HTR_Disassembly_Plate.stp",
+    "cad_dimensions_m": [
+      0.10399999469518661,
+      0.0669999998062849,
+      0.023300000466406345
+    ],
+    "mass_kg": null,
+    "pdf_dimensions_m": null,
+    "mass_estimated": true,
+    "estimated_contact_parameters": {
+      "contact_offset_m": 0.0001,
+      "rest_offset_m": 0.0,
+      "max_depenetration_velocity_m_s": 0.02,
+      "linear_damping_per_s": 1.0,
+      "angular_damping_per_s": 1.0
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "leg_joint1": 0.3633472702746227,
+  "leg_joint2": 1.4082859482362369,
+  "leg_joint3": 1.0449386779615855,
+  "leg_joint4": 1.066819049859323e-07,
+  "leg_joint5": -3.783285770711732e-08,
+  "left_arm_joint1": -1.8786408059474629,
+  "left_arm_joint2": 1.3139756622914704,
+  "left_arm_joint3": 2.7702580616137062,
+  "left_arm_joint4": 1.3464480951499465,
+  "left_arm_joint5": 0.0,
+  "left_arm_joint6": 0.0,
+  "left_arm_joint7": 0.0,
+  "right_arm_joint1": -1.8786405595793942,
+  "right_arm_joint2": 1.3139757514691408,
+  "right_arm_joint3": 2.770258031698816,
+  "right_arm_joint4": 1.3464480034713782,
+  "right_arm_joint5": 0.0,
+  "right_arm_joint6": 0.0,
+  "right_arm_joint7": 0.0,
+  "left_gripper_joint": 0.0,
+  "right_gripper_joint": 0.0
+}

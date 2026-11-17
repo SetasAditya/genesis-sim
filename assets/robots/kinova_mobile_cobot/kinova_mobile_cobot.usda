@@ -1,0 +1,324 @@
+#usda 1.0
+(
+    defaultPrim = "KinovaMobileCobot"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "KinovaMobileCobot" (
+    prepend references = @../kinova_gen3_robotiq_2f85/kinova_gen3_7dof_robotiq_2f85.usd@
+)
+{
+    def Material "gripper_pad_physics" (
+        prepend apiSchemas = ["PhysicsMaterialAPI", "PhysxMaterialAPI"]
+    )
+    {
+        float physics:dynamicFriction = 1.2
+        float physics:restitution = 0
+        float physics:staticFriction = 1.5
+        uniform token physxMaterial:frictionCombineMode = "max"
+        uniform token physxMaterial:restitutionCombineMode = "min"
+    }
+
+    def Material "gripper_pad_visual"
+    {
+        token outputs:surface.connect = </KinovaMobileCobot/gripper_pad_visual/PBR.outputs:surface>
+
+        def Shader "PBR"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.055, 0.06, 0.065)
+            float inputs:metallic = 0
+            float inputs:roughness = 0.85
+            token outputs:surface
+        }
+    }
+
+    over "root_joint" (
+        active = false
+    )
+    {
+    }
+
+    over "joints"
+    {
+        over "robotiq_85_left_inner_knuckle_joint" (
+            prepend apiSchemas = ["PhysxMimicJointAPI:rotY"]
+        )
+        {
+            float physxMimicJoint:rotY:gearing = -1
+            float physxMimicJoint:rotY:offset = 0
+            rel physxMimicJoint:rotY:referenceJoint = </KinovaMobileCobot/joints/robotiq_85_left_knuckle_joint>
+            uniform token physxMimicJoint:rotY:referenceJointAxis = "rotY"
+        }
+
+        over "robotiq_85_right_inner_knuckle_joint" (
+            prepend apiSchemas = ["PhysxMimicJointAPI:rotY"]
+        )
+        {
+            float physxMimicJoint:rotY:gearing = -1
+            float physxMimicJoint:rotY:offset = 0
+            rel physxMimicJoint:rotY:referenceJoint = </KinovaMobileCobot/joints/robotiq_85_right_knuckle_joint>
+            uniform token physxMimicJoint:rotY:referenceJointAxis = "rotY"
+        }
+
+        over "robotiq_85_left_finger_tip_joint" (
+            prepend apiSchemas = ["PhysxMimicJointAPI:rotY"]
+        )
+        {
+            float physxMimicJoint:rotY:gearing = 1
+            float physxMimicJoint:rotY:offset = 0
+            rel physxMimicJoint:rotY:referenceJoint = </KinovaMobileCobot/joints/robotiq_85_left_knuckle_joint>
+            uniform token physxMimicJoint:rotY:referenceJointAxis = "rotY"
+        }
+
+        over "robotiq_85_right_finger_tip_joint" (
+            prepend apiSchemas = ["PhysxMimicJointAPI:rotY"]
+        )
+        {
+            float physxMimicJoint:rotY:gearing = 1
+            float physxMimicJoint:rotY:offset = 0
+            rel physxMimicJoint:rotY:referenceJoint = </KinovaMobileCobot/joints/robotiq_85_right_knuckle_joint>
+            uniform token physxMimicJoint:rotY:referenceJointAxis = "rotY"
+        }
+    }
+
+    over Xform "base_link" (
+        prepend apiSchemas = ["PhysicsArticulationRootAPI", "PhysicsMassAPI"]
+    )
+    {
+        point3f physics:centerOfMass = (0, 0, -0.28)
+        float3 physics:diagonalInertia = (4, 4, 6)
+        float physics:mass = 65
+
+        def Scope "cobot_fixtures"
+        {
+            def Material "dark_base"
+            {
+                token outputs:surface.connect = </KinovaMobileCobot/base_link/cobot_fixtures/dark_base/PBR.outputs:surface>
+
+                def Shader "PBR"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (0.08, 0.085, 0.09)
+                    float inputs:metallic = 0.35
+                    float inputs:roughness = 0.42
+                    token outputs:surface
+                }
+            }
+
+            def Material "silver"
+            {
+                token outputs:surface.connect = </KinovaMobileCobot/base_link/cobot_fixtures/silver/PBR.outputs:surface>
+
+                def Shader "PBR"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (0.58, 0.61, 0.64)
+                    float inputs:metallic = 0.65
+                    float inputs:roughness = 0.3
+                    token outputs:surface
+                }
+            }
+
+            def Material "screen"
+            {
+                token outputs:surface.connect = </KinovaMobileCobot/base_link/cobot_fixtures/screen/PBR.outputs:surface>
+
+                def Shader "PBR"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (0.025, 0.08, 0.12)
+                    color3f inputs:emissiveColor = (0.015, 0.12, 0.18)
+                    float inputs:roughness = 0.2
+                    token outputs:surface
+                }
+            }
+
+            def Cylinder "drive_base" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                uniform token axis = "Z"
+                double height = 0.162
+                rel material:binding = </KinovaMobileCobot/base_link/cobot_fixtures/dark_base>
+                double radius = 0.3
+                token visibility = "invisible"
+                double3 xformOp:translate = (0, 0, -0.387)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Cube "arm_pedestal" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                rel material:binding = </KinovaMobileCobot/base_link/cobot_fixtures/silver>
+                token visibility = "invisible"
+                double3 xformOp:scale = (0.0625, 0.0625, 0.153)
+                double3 xformOp:translate = (0, 0, -0.154)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "rear_screen" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                rel material:binding = </KinovaMobileCobot/base_link/cobot_fixtures/screen>
+                token visibility = "invisible"
+                double3 xformOp:scale = (0.012, 0.165, 0.12)
+                double3 xformOp:translate = (-0.17, 0.03, 0.04)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "sensor_mast" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                rel material:binding = </KinovaMobileCobot/base_link/cobot_fixtures/silver>
+                token visibility = "invisible"
+                double3 xformOp:scale = (0.0125, 0.0125, 0.35)
+                double3 xformOp:translate = (0.0656, -0.3507, 0.3)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "sensor_support" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                rel material:binding = </KinovaMobileCobot/base_link/cobot_fixtures/silver>
+                token visibility = "invisible"
+                double3 xformOp:scale = (0.0125, 0.23, 0.0125)
+                double3 xformOp:translate = (-0.0188, -0.168, -0.06)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "camera_bracket" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                rel material:binding = </KinovaMobileCobot/base_link/cobot_fixtures/silver>
+                token visibility = "invisible"
+                double3 xformOp:scale = (0.075, 0.045, 0.02)
+                double3 xformOp:translate = (0.0656, -0.3507, 0.6)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cylinder "livox_mid360" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                uniform token axis = "Z"
+                double height = 0.065
+                rel material:binding = </KinovaMobileCobot/base_link/cobot_fixtures/dark_base>
+                double radius = 0.035
+                double3 xformOp:translate = (0.12, 0, -0.185)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+        }
+
+        def Xform "detailed_chassis_visual" (
+            prepend references = @./cobot_chassis_visual.usdc@
+        )
+        {
+        }
+    }
+
+    over "robotiq_85_left_finger_tip_link" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding:physics = </KinovaMobileCobot/gripper_pad_physics> (
+            bindMaterialAs = "strongerThanDescendants"
+        )
+
+        over "visuals"
+        {
+            token visibility = "invisible"
+        }
+
+        over "collisions" (
+            instanceable = false
+        )
+        {
+            over "left_finger_tip"
+            {
+                over "mesh" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    rel material:binding:physics = </KinovaMobileCobot/gripper_pad_physics> (
+                        bindMaterialAs = "strongerThanDescendants"
+                    )
+                    bool physics:collisionEnabled = 0
+                }
+            }
+        }
+
+        def Cube "flat_contact_pad_collision" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </KinovaMobileCobot/gripper_pad_visual>
+            rel material:binding:physics = </KinovaMobileCobot/gripper_pad_physics> (
+                bindMaterialAs = "strongerThanDescendants"
+            )
+            bool physics:collisionEnabled = 1
+            float physxCollision:contactOffset = 0.001
+            float physxCollision:restOffset = 0
+            token visibility = "inherited"
+            double3 xformOp:scale = (0.003175, 0.011, 0.01875)
+            double3 xformOp:translate = (-0.008, 0, 0.03)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+    }
+
+    over "robotiq_85_right_finger_tip_link" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding:physics = </KinovaMobileCobot/gripper_pad_physics> (
+            bindMaterialAs = "strongerThanDescendants"
+        )
+
+        over "visuals"
+        {
+            token visibility = "invisible"
+        }
+
+        over "collisions" (
+            instanceable = false
+        )
+        {
+            over "right_finger_tip"
+            {
+                over "mesh" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    rel material:binding:physics = </KinovaMobileCobot/gripper_pad_physics> (
+                        bindMaterialAs = "strongerThanDescendants"
+                    )
+                    bool physics:collisionEnabled = 0
+                }
+            }
+        }
+
+        def Cube "flat_contact_pad_collision" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI", "MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </KinovaMobileCobot/gripper_pad_visual>
+            rel material:binding:physics = </KinovaMobileCobot/gripper_pad_physics> (
+                bindMaterialAs = "strongerThanDescendants"
+            )
+            bool physics:collisionEnabled = 1
+            float physxCollision:contactOffset = 0.001
+            float physxCollision:restOffset = 0
+            token visibility = "inherited"
+            double3 xformOp:scale = (0.003175, 0.011, 0.01875)
+            double3 xformOp:translate = (0.008, 0, 0.03)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+    }
+}
+

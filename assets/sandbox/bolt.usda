@@ -1,0 +1,46 @@
+#usda 1.0
+(
+    defaultPrim = "bolt"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "bolt" (
+    prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
+)
+{
+    float physics:mass = 0.035
+    bool physics:rigidBodyEnabled = 1
+    float physxRigidBody:maxDepenetrationVelocity = 0.2
+    int physxRigidBody:solverPositionIterationCount = 32
+    int physxRigidBody:solverVelocityIterationCount = 4
+
+    def Cylinder "shape_1" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI"]
+    )
+    {
+        uniform token axis = "Z"
+        double height = 0.035
+        float physxCollision:contactOffset = 0.0001
+        float physxCollision:restOffset = 0
+        color3f[] primvars:displayColor = [(0.53, 0.56, 0.6)]
+        double radius = 0.005
+        double3 xformOp:translate = (0, 0, 0.0175)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Cylinder "shape_2" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI"]
+    )
+    {
+        uniform token axis = "Z"
+        double height = 0.007
+        float physxCollision:contactOffset = 0.0001
+        float physxCollision:restOffset = 0
+        color3f[] primvars:displayColor = [(0.53, 0.56, 0.6)]
+        double radius = 0.0085
+        double3 xformOp:translate = (0, 0, 0.0385)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+}
+

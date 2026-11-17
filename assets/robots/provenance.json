@@ -1,0 +1,16 @@
+{
+  "source": "RoboLab working tree",
+  "source_revision": "0bc479299d0b41aa487d160ef58cbca03ac9a4f1",
+  "includes_local_modifications": true,
+  "mobile_model": "kinova_mobile_cobot/kinova_mobile_cobot.usda",
+  "planner_urdf": "kinova_mobile_cobot/curobo/kinova_gen3_robolab.urdf",
+  "planner_urdf_scope": "Kinova Gen3 arm kinematics only; no mobile base, meshes or inertias",
+  "dependent_arm_model": "kinova_gen3_robotiq_2f85/kinova_gen3_7dof_robotiq_2f85.usd",
+  "kinova_upstream_revision": "78e6dee598865f0f9b352f1a57b929dae14ce61a",
+  "robotiq_upstream_revision": "12e623212e6891a5fcc9af94d67b07e640916394",
+  "licenses": [
+    "kinova_mobile_cobot/LICENSE-ROBOLAB",
+    "kinova_gen3_robotiq_2f85/LICENSE-KINOVA",
+    "kinova_gen3_robotiq_2f85/LICENSE-ROBOTIQ"
+  ]
+}

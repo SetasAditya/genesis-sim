@@ -1,0 +1,1194 @@
+#usda 1.0
+(
+    defaultPrim = "Galbot"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "Galbot" (
+    delete apiSchemas = ["PhysicsArticulationRootAPI"]
+    prepend references = @https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/Robots/Galbot/galbot_g1/galbot_g1.usda@
+    variants = {
+        string Physics = "physx"
+        string Sensor = "none"
+    }
+)
+{
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    over "OmniChassis"
+    {
+        over "Graph"
+        {
+            over "ROS_Odometry" (
+                active = false
+            )
+            {
+            }
+
+            over "holonomic_controller" (
+                active = false
+            )
+            {
+            }
+        }
+
+        over "base_link" (
+            prepend apiSchemas = ["PhysicsArticulationRootAPI", "PhysxArticulationAPI", "PhysxRigidBodyAPI"]
+        )
+        {
+            bool physxArticulation:enabledSelfCollisions = 0
+            int physxArticulation:solverPositionIterationCount = 32
+            int physxArticulation:solverVelocityIterationCount = 8
+            float physxRigidBody:maxDepenetrationVelocity = 1
+            matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0.134, 0, 0.075, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+            over "omni_chassis_base_link"
+            {
+                over "omni_chassis_leg_mount_link" (
+                    prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                )
+                {
+                    float physxRigidBody:maxDepenetrationVelocity = 1
+                    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0.1339999999999999, 0, 0.13249999999999984, 1) )
+                    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                    over "leg_base_link"
+                    {
+                        over "leg_link1" (
+                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                        )
+                        {
+                            float physxRigidBody:maxDepenetrationVelocity = 1
+                            matrix4d xformOp:transform = ( (-0.7328142163763477, -2.845579628346945e-8, 0.6804284790853696, 0), (0.6804284359375791, 1.5795705057712922e-7, 0.7328143298547211, 0), (-8.273670459857385e-8, 0.9999998785954158, 1.3753108696334948e-7, 0), (0, 0, 0, 1) )
+                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                            over "leg_link2" (
+                                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                            )
+                            {
+                                float physxRigidBody:maxDepenetrationVelocity = 1
+                                matrix4d xformOp:transform = ( (0.22065147917672573, 0.9753527181115375, -8.627091464882184e-8, 0), (0.9753527128685704, -0.2206514783171098, -1.4144656884582495e-8, 0), (-3.283183447938168e-8, -8.102353162782621e-8, -0.9999999946870235, 0), (0.4499999880790711, -2.7755575615628914e-17, 0, 1.0000000000000002) )
+                                uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                over "leg_link3" (
+                                    prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                )
+                                {
+                                    float physxRigidBody:maxDepenetrationVelocity = 1
+                                    matrix4d xformOp:transform = ( (-0.5019550399267119, 0.8648937147951595, -7.561141382465372e-8, 0), (0.8648937147951696, 0.501955039926706, -4.388229669528323e-8, 0), (7.64274186065882e-15, -8.742277657347566e-8, -1.0000000000000036, 0), (0.38999998569488514, 0, -1.3855275260263214e-23, 0.9999999999999998) )
+                                    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                    over "leg_link4" (
+                                        prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                    )
+                                    {
+                                        float physxRigidBody:maxDepenetrationVelocity = 1
+                                        matrix4d xformOp:transform = ( (2.258911782665253e-7, 1.2717473769317743e-14, 0.9999998807907085, 0), (0.9999998807906959, 1.1920928605357703e-7, -1.066818922684584e-7, 0), (-5.551284529715234e-17, 0.9999998807907139, 1.192092859980676e-7, 0), (1.5319437884041276e-17, 0.22400000691413868, 1.3234889800848443e-23, 1) )
+                                        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                        over "leg_link5" (
+                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                        )
+                                        {
+                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                            matrix4d xformOp:transform = ( (0.9999999999999996, -1.294963588052824e-15, -3.783285641215374e-8, 0), (3.7832857707117295e-8, 3.422854177870588e-8, 0.9999999657714579, 0), (6.020606623485936e-23, -0.999999965771458, 3.422854177870249e-8, 0), (-2.6469779601696886e-23, 1.6940658945086007e-21, 0, 1.0000000000000002) )
+                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                            over "leg_end_effector_mount_link"
+                                            {
+                                                over "torso_base_link"
+                                                {
+                                                    over "Arms"
+                                                    {
+                                                        over "joints"
+                                                        {
+                                                            over "left_arm_joint1"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = -107.63819
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = -107.63819
+                                                            }
+
+                                                            over "left_arm_joint2"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 75.28526
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 75.28526
+                                                            }
+
+                                                            over "left_arm_joint3"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 158.72409
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 158.72409
+                                                            }
+
+                                                            over "left_arm_joint4"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 77.14579
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 77.14579
+                                                            }
+
+                                                            over "left_arm_joint5"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 0
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 0
+                                                            }
+
+                                                            over "left_arm_joint6"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 0
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 0
+                                                            }
+
+                                                            over "left_arm_joint7"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 0
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 0
+                                                            }
+
+                                                            over "right_arm_joint1"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = -107.638176
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = -107.638176
+                                                            }
+
+                                                            over "right_arm_joint2"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 75.28526
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 75.28526
+                                                            }
+
+                                                            over "right_arm_joint3"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 158.72409
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 158.72409
+                                                            }
+
+                                                            over "right_arm_joint4"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 77.14579
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 77.14579
+                                                            }
+
+                                                            over "right_arm_joint5"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 0
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 0
+                                                            }
+
+                                                            over "right_arm_joint6"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 0
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 0
+                                                            }
+
+                                                            over "right_arm_joint7"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 0
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 0
+                                                            }
+                                                        }
+
+                                                        over "arm_base" (
+                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                        )
+                                                        {
+                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                            matrix4d xformOp:transform = ( (0.9999999999999997, -4.440907450972795e-16, -2.2204138415373103e-16, 0), (4.440892098500626e-16, 0.9999999999999996, 2.2204545195797856e-16, 0), (2.2204456064845227e-16, -2.220446049250313e-16, 0.9999999999999997, 0), (-5.793747710866777e-17, 0, -9.367506770274758e-17, 0.9999999999999997) )
+                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                            over "left_arm_base_link"
+                                                            {
+                                                                over "left_arm_link1" (
+                                                                    prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                )
+                                                                {
+                                                                    float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                    matrix4d xformOp:transform = ( (0.21408428029224946, -0.9768151851590698, -2.550093811200801e-8, 0), (0.976815081908622, 0.2140842474635176, 1.3668539960052352e-7, 0), (-1.4257234133255277e-7, -5.293955920339377e-23, 0.9999998916561926, 0), (0, -2.220446049250313e-16, 0, 1.0000000000000002) )
+                                                                    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                    over "left_arm_link2" (
+                                                                        prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                    )
+                                                                    {
+                                                                        float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                        matrix4d xformOp:transform = ( (-0.25400676241235676, 1.0899949227927141e-8, 0.9672024047607103, 0), (0.9672023716547794, 9.3249803961859e-8, 0.25400677110663894, 0), (-8.742277676776489e-8, 0.9999999657714564, 3.422853989132333e-8, 0), (0, 5.551115123125783e-17, 0, 0.9999999999999999) )
+                                                                        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                        over "left_arm_link3" (
+                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                        )
+                                                                        {
+                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                            matrix4d xformOp:transform = ( (0.15167636095537051, -1.6456457030411542e-8, 0.9884300953163343, 0), (0.9884300590411186, -1.58920043152877e-7, -0.1516764541122249, 0), (7.300047860647751e-8, 0.9999999000295502, 1.4211729401636397e-7, 0), (0, 0.3499999940395355, 0, 1) )
+                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                            over "left_arm_link4" (
+                                                                                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                            )
+                                                                            {
+                                                                                float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                matrix4d xformOp:transform = ( (-0.2224709748370385, -5.281977949467276e-8, -0.9749392803073169, 0), (-0.9749393136780622, -7.761704538811198e-8, 0.2224709672221828, 0), (-8.742277671225374e-8, 0.9999999657714563, -3.422853989132335e-8, 0), (0, -5.551115123125783e-17, -1.1102230246251565e-16, 1.0000000000000002) )
+                                                                                uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                over "left_arm_link5" (
+                                                                                    prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                )
+                                                                                {
+                                                                                    float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                    matrix4d xformOp:transform = ( (0.9999999999999998, 0, -2.7755575615628914e-17, 0), (-2.7755575615628914e-17, 3.4228541764824705e-8, -0.9999999657714579, 0), (1.1102230246251565e-16, 0.9999999657714582, 3.422854186196922e-8, 0), (-2.220446049250313e-16, 0.36000001430511464, 1.1102230246251565e-16, 0.9999999999999997) )
+                                                                                    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                    over "left_arm_link6" (
+                                                                                        prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                    )
+                                                                                    {
+                                                                                        float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                        matrix4d xformOp:transform = ( (1.1920928594255642e-7, -2.7755575615628914e-17, -0.9999998807907141, 0), (0.999999880790714, 1.1920928613684545e-7, 1.1102230246251565e-16, 0), (2.7755575615628914e-17, -0.9999998807907141, 1.1920928601194536e-7, 0), (2.220446049250313e-16, 5.551115123125783e-17, 2.220446049250313e-16, 1.0000000000000002) )
+                                                                                        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                        over "left_arm_link7" (
+                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                        )
+                                                                                        {
+                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                            matrix4d xformOp:transform = ( (1, 5.551115123125783e-17, -1.3877787807814457e-17, 0), (1.3877787807814457e-17, 3.422854180645807e-8, 0.9999999657714583, 0), (-1.1102230246251565e-16, -0.9999999657714583, 3.422854166768019e-8, 0), (0, -2.220446049250313e-16, -5.551115123125783e-17, 1) )
+                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                            over "Galbot_Gripper_Left"
+                                                                                            {
+                                                                                                over "joints"
+                                                                                                {
+                                                                                                    over "gripper_l_inner_knuckle_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "gripper_l_finger_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "gripper_l_knuckle_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "gripper_r_inner_knuckle_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "gripper_r_finger_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "left_gripper_joint"
+                                                                                                    {
+                                                                                                        float drive:angular:physics:damping = 20
+                                                                                                        float drive:angular:physics:stiffness = 200
+                                                                                                        float drive:angular:physics:targetPosition = 0
+                                                                                                        float drive:angular:physics:targetVelocity = 0
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+                                                                                                }
+
+                                                                                                over "gripper_flange" (
+                                                                                                    prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                )
+                                                                                                {
+                                                                                                    float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                    matrix4d xformOp:transform = ( (0.9999999315429169, -1.1102230246251565e-16, 0, 0), (1.1102230246251565e-16, 0.9999999657714587, -3.422854225054728e-8, 0), (2.7755575615628914e-17, -3.422854102930195e-8, 0.9999999657714582, 0), (-4.4703483595420757e-8, 5.820777193576987e-11, -6.54835630164996e-11, 0.9999999999999999) )
+                                                                                                    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                                    over "gripper_base"
+                                                                                                    {
+                                                                                                        over "gripper_l_inner_knuckle_link" (
+                                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                        )
+                                                                                                        {
+                                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                            matrix4d xformOp:transform = ( (0.3186419355985172, -4.163336342344337e-17, -0.947875089075971, 0), (0.947875089075971, 9.714954352091354e-8, 0.3186418384489736, 0), (0, -0.999999902850456, 9.714954349315796e-8, 0), (0.07900000177323822, 1.1102230246251565e-16, -0.026000000536441747, 0.9999999999999997) )
+                                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                                            over "gripper_l_finger_link" (
+                                                                                                                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                            )
+                                                                                                            {
+                                                                                                                float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                                matrix4d xformOp:transform = ( (0.3186419162293248, 0.9478751411475488, -5.551115123125783e-17, 0), (-0.9478751411475488, 0.31864191622932486, 2.7755575615628914e-17, 0), (1.3877787807814457e-17, -5.551115123125783e-17, 1.0000000000000002, 0), (0.0450000017881394, -2.7755575615628914e-17, 1.1102230246251565e-16, 1) )
+                                                                                                                uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                                                            }
+                                                                                                        }
+
+                                                                                                        over "gripper_l_knuckle_link" (
+                                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                        )
+                                                                                                        {
+                                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                            matrix4d xformOp:transform = ( (0.3186419355985172, -4.163336342344337e-17, -0.947875089075971, 0), (0.947875089075971, 9.714954352091354e-8, 0.3186418384489736, 0), (0, -0.999999902850456, 9.714954349315796e-8, 0), (0.07450000010430823, 0, -0.03849999979138369, 0.9999999999999997) )
+                                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                                                        }
+
+                                                                                                        over "gripper_r_inner_knuckle_link" (
+                                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                        )
+                                                                                                        {
+                                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                            matrix4d xformOp:transform = ( (0.31864193559851717, 5.551115123125783e-17, 0.947875089075971, 0), (-0.9478750890759711, 9.714954352091354e-8, 0.3186418384489737, 0), (0, -0.999999902850456, 9.714954349315796e-8, 0), (0.07900000177323822, 0, 0.026000000536441803, 0.9999999999999997) )
+                                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                                            over "gripper_r_finger_link" (
+                                                                                                                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                            )
+                                                                                                            {
+                                                                                                                float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                                matrix4d xformOp:transform = ( (0.31864191622932486, -0.9478751411475486, 0, 0), (0.9478751411475486, 0.3186419162293248, 8.326672684688674e-17, 0), (-5.551115123125783e-17, 0, 1, 0), (0.04500000178813929, 0, 1.1102230246251565e-16, 1.0000000000000002) )
+                                                                                                                uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                                                            }
+                                                                                                        }
+
+                                                                                                        over "gripper_r_knuckle_link" (
+                                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                        )
+                                                                                                        {
+                                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                            matrix4d xformOp:transform = ( (0.3186417412994301, 0, 0.947875089075971, 0), (-0.9478750890759711, 9.714954352091354e-8, 0.3186418384489737, 0), (0, -0.9999999028504561, -9.714954354866912e-8, 0), (0.07450000010430823, 0, 0.0384999997913838, 0.9999999999999997) )
+                                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            over "right_arm_base_link"
+                                                            {
+                                                                over "right_arm_link1" (
+                                                                    prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                )
+                                                                {
+                                                                    float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                    matrix4d xformOp:transform = ( (0.21408452094828762, 0.976814925914614, -3.402022866136678e-8, 0), (-0.9768150291650668, 0.2140845537769834, -1.258462349615955e-7, 0), (8.652698801903115e-8, 6.001314967519178e-9, 0.9999998916561983, 0), (0, 4.440892098500626e-16, 2.7755575615628914e-17, 1.0000000000000002) )
+                                                                    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                    over "right_arm_link2" (
+                                                                        prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                    )
+                                                                    {
+                                                                        float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                        matrix4d xformOp:transform = ( (-0.2540066935480578, -5.5311898464194265e-8, 0.9672024274124388, 0), (-0.9672024605183629, -7.58612465623365e-8, -0.25400668485378053, 0), (8.742277679552046e-8, -0.9999999657714563, -3.42285398913234e-8, 0), (-2.220446049250313e-16, -1.6653345369377348e-16, -2.7755575615628914e-17, 0.9999999999999998) )
+                                                                        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                        over "right_arm_link3" (
+                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                        )
+                                                                        {
+                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                            matrix4d xformOp:transform = ( (0.1516765177002939, -8.900688730495432e-8, 0.9884300998537188, 0), (-0.9884301361289348, -2.739365634329971e-8, 0.15167642454344724, 0), (-7.300047846769964e-8, -0.9999999000295503, -1.4211729384983052e-7, 0), (0, -0.3499999940395355, -1.1102230246251565e-16, 1) )
+                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                            over "right_arm_link4" (
+                                                                                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                            )
+                                                                            {
+                                                                                float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                matrix4d xformOp:transform = ( (-0.2224710489883587, 1.3921710312336799e-8, -0.9749392599114926, 0), (0.9749392265407401, 9.2846759849885e-8, -0.22247105660321945, 0), (8.742277683021493e-8, -0.9999999657714563, 3.42285398358122e-8, 0), (0, -5.551115123125783e-17, -1.1102230246251565e-16, 1) )
+                                                                                uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                over "right_arm_link5" (
+                                                                                    prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                )
+                                                                                {
+                                                                                    float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                    matrix4d xformOp:transform = ( (-0.9999999999999959, -8.742277662898701e-8, -2.7755575615628914e-17, 0), (0, 3.4228539919078926e-8, -0.9999999657714599, 0), (8.742277679552046e-8, -0.9999999657714564, -3.42285398358122e-8, 0), (-1.1102230246251565e-16, -0.36000001430511486, -5.551115123125783e-17, 0.9999999999999999) )
+                                                                                    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                    over "right_arm_link6" (
+                                                                                        prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                    )
+                                                                                    {
+                                                                                        float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                        matrix4d xformOp:transform = ( (-1.1920928599806757e-7, 0, -0.9999998807907141, 0), (0.9999998807907142, 1.1920928602582315e-7, 0, 0), (-2.7755575615628914e-17, -0.999999880790714, -1.1920928595643421e-7, 0), (1.1102230246251565e-16, 0, -1.1102230246251565e-16, 1) )
+                                                                                        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                        over "right_arm_link7" (
+                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                        )
+                                                                                        {
+                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                            matrix4d xformOp:transform = ( (0.9999999315429162, 5.551115123125783e-17, -1.3877787807814457e-17, 0), (1.3877787807814457e-17, 3.422854180645807e-8, -0.9999999657714582, 0), (-5.551115123125783e-17, 0.999999965771458, -3.422854172319134e-8, 0), (-8.326672684688674e-17, -1.1102230246251565e-16, 5.551115123125783e-17, 0.9999999999999999) )
+                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                            over "Galbot_Gripper_Right"
+                                                                                            {
+                                                                                                over "joints"
+                                                                                                {
+                                                                                                    over "gripper_l_inner_knuckle_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "gripper_l_finger_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "gripper_l_knuckle_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "gripper_r_inner_knuckle_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "gripper_r_finger_joint"
+                                                                                                    {
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+
+                                                                                                    over "right_gripper_joint"
+                                                                                                    {
+                                                                                                        float drive:angular:physics:damping = 20
+                                                                                                        float drive:angular:physics:stiffness = 200
+                                                                                                        float drive:angular:physics:targetPosition = 0
+                                                                                                        float drive:angular:physics:targetVelocity = 0
+                                                                                                        float state:angular:physics:position = 0
+                                                                                                    }
+                                                                                                }
+
+                                                                                                over "gripper_flange" (
+                                                                                                    prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                )
+                                                                                                {
+                                                                                                    float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                    matrix4d xformOp:transform = ( (0.999999931542916, 1.6653345369377348e-16, 0, 0), (-1.1102230246251565e-16, 0.9999999657714578, 3.422854089052407e-8, 0), (4.163336342344337e-17, 3.422854216728055e-8, 0.9999999657714581, 0), (-4.4703484462782495e-8, 5.820766091346741e-11, -6.548389608340699e-11, 0.9999999999999999) )
+                                                                                                    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                                    over "gripper_base"
+                                                                                                    {
+                                                                                                        over "gripper_l_inner_knuckle_link" (
+                                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                        )
+                                                                                                        {
+                                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                            matrix4d xformOp:transform = ( (0.3186419355985173, 2.7755575615628914e-17, -0.9478750890759712, 0), (0.9478750890759713, 9.714954346540239e-8, 0.31864183844897376, 0), (5.551115123125783e-17, -0.9999999028504563, 9.714954343764681e-8, 0), (0.07900000177323804, -1.1102230246251565e-16, -0.02600000053644186, 0.9999999999999999) )
+                                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                                            over "gripper_l_finger_link" (
+                                                                                                                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                            )
+                                                                                                            {
+                                                                                                                float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                                matrix4d xformOp:transform = ( (0.31864191622932486, 0.9478751411475486, -1.1102230246251565e-16, 0), (-0.9478751411475487, 0.31864191622932486, -2.7755575615628914e-17, 0), (-4.85722573273506e-17, -1.1102230246251565e-16, 1.0000000000000002, 0), (0.045000001788139454, -1.3877787807814457e-17, -1.1102230246251565e-16, 1.0000000000000004) )
+                                                                                                                uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                                                            }
+                                                                                                        }
+
+                                                                                                        over "gripper_l_knuckle_link" (
+                                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                        )
+                                                                                                        {
+                                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                            matrix4d xformOp:transform = ( (0.3186419355985173, 2.7755575615628914e-17, -0.9478750890759712, 0), (0.9478750890759713, 9.714954346540239e-8, 0.31864183844897376, 0), (5.551115123125783e-17, -0.9999999028504563, 9.714954343764681e-8, 0), (0.07450000010430799, 0, -0.03849999979138374, 0.9999999999999999) )
+                                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                                                        }
+
+                                                                                                        over "gripper_r_inner_knuckle_link" (
+                                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                        )
+                                                                                                        {
+                                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                            matrix4d xformOp:transform = ( (0.3186419355985172, -5.551115123125783e-17, 0.9478750890759712, 0), (-0.9478750890759712, 9.714954352091354e-8, 0.31864183844897365, 0), (5.551115123125783e-17, -0.9999999028504563, 9.714954343764681e-8, 0), (0.0790000017732381, 0, 0.026000000536441803, 0.9999999999999999) )
+                                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                                                            over "gripper_r_finger_link" (
+                                                                                                                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                            )
+                                                                                                            {
+                                                                                                                float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                                matrix4d xformOp:transform = ( (0.3186419162293248, -0.947875141147549, 0, 0), (0.9478751411475486, 0.3186419162293248, 2.7755575615628914e-17, 0), (-5.551115123125783e-17, 1.1102230246251565e-16, 1.0000000000000002, 0), (0.04500000178813923, 5.551115123125783e-17, 1.1102230246251565e-16, 1.0000000000000004) )
+                                                                                                                uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                                                            }
+                                                                                                        }
+
+                                                                                                        over "gripper_r_knuckle_link" (
+                                                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                                                        )
+                                                                                                        {
+                                                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                                                            matrix4d xformOp:transform = ( (0.31864174129943024, -5.551115123125783e-17, 0.9478750890759713, 0), (-0.9478750890759712, 9.714954352091354e-8, 0.31864183844897365, 0), (-5.551115123125783e-17, -0.9999999028504563, -9.714954363193584e-8, 0), (0.07450000010430805, 0, 0.03849999979138363, 0.9999999999999999) )
+                                                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    over "Head_Golf"
+                                                    {
+                                                        over "joints"
+                                                        {
+                                                            over "head_joint1"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 0
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 0
+                                                            }
+
+                                                            over "head_joint2"
+                                                            {
+                                                                float drive:angular:physics:damping = 600
+                                                                float drive:angular:physics:stiffness = 60000
+                                                                float drive:angular:physics:targetPosition = 0
+                                                                float drive:angular:physics:targetVelocity = 0
+                                                                float state:angular:physics:position = 0
+                                                            }
+                                                        }
+
+                                                        over "torso_base_link" (
+                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                        )
+                                                        {
+                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                            matrix4d xformOp:transform = ( (0.9999999999999997, -4.440907450972795e-16, -2.2204138415373103e-16, 0), (4.440892098500626e-16, 0.9999999999999996, 2.2204545195797856e-16, 0), (2.2204456064845227e-16, -2.220446049250313e-16, 0.9999999999999997, 0), (-9.105495656887362e-17, 0, -7.632783294297951e-17, 0.9999999999999997) )
+                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                            over "torso_head_mount_link"
+                                                            {
+                                                                over "head_base_link"
+                                                                {
+                                                                    over "head_link1" (
+                                                                        prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                    )
+                                                                    {
+                                                                        float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                        matrix4d xformOp:transform = ( (0.9999998807907079, 1.5894571165415204e-7, -3.973641925996531e-8, 0), (-3.973641925996676e-8, 0.9999998807907077, 1.5894571165415188e-7, 0), (1.5894571165415315e-7, -3.973641925996674e-8, 0.9999998807907077, 0), (-8.470329472543003e-22, -5.293955920339377e-23, -2.220446049250313e-16, 1) )
+                                                                        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+                                                                        over "head_link2" (
+                                                                            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+                                                                        )
+                                                                        {
+                                                                            float physxRigidBody:maxDepenetrationVelocity = 1
+                                                                            matrix4d xformOp:transform = ( (0.9999999999999998, 1.4465967196874629e-23, -8.470329472543003e-22, 0), (-8.470329472543003e-22, 3.422854177870244e-8, -0.9999999657714582, 0), (1.9612823908673081e-23, 0.9999999657714584, 3.422854177870249e-8, 0), (0, 1.0587911840678754e-22, 0, 1) )
+                                                                            uniform token[] xformOpOrder = ["xformOp:transform"]
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        over "joints"
+                        {
+                            over "leg_joint1"
+                            {
+                                float drive:angular:physics:damping = 600
+                                float drive:angular:physics:stiffness = 60000
+                                float drive:angular:physics:targetPosition = 20.818266
+                                float drive:angular:physics:targetVelocity = 0
+                                float state:angular:physics:position = 20.818266
+                            }
+
+                            over "leg_joint2"
+                            {
+                                float drive:angular:physics:damping = 600
+                                float drive:angular:physics:stiffness = 60000
+                                float drive:angular:physics:targetPosition = 80.68884
+                                float drive:angular:physics:targetVelocity = 0
+                                float state:angular:physics:position = 80.68884
+                            }
+
+                            over "leg_joint3"
+                            {
+                                float drive:angular:physics:damping = 600
+                                float drive:angular:physics:stiffness = 60000
+                                float drive:angular:physics:targetPosition = 59.870575
+                                float drive:angular:physics:targetVelocity = 0
+                                float state:angular:physics:position = 59.870575
+                            }
+
+                            over "leg_joint4"
+                            {
+                                float drive:angular:physics:damping = 600
+                                float drive:angular:physics:stiffness = 60000
+                                float drive:angular:physics:targetPosition = 0.000006112423
+                                float drive:angular:physics:targetVelocity = 0
+                                float state:angular:physics:position = 0.000006112423
+                            }
+
+                            over "leg_joint5"
+                            {
+                                float drive:angular:physics:damping = 600
+                                float drive:angular:physics:stiffness = 60000
+                                float drive:angular:physics:targetPosition = -0.000002167663
+                                float drive:angular:physics:targetVelocity = 0
+                                float state:angular:physics:position = -0.000002167663
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        over "joints"
+        {
+            over "wheel1_joint"
+            {
+                float drive:angular:physics:damping = 20
+                float drive:angular:physics:stiffness = 0
+                float drive:angular:physics:targetPosition = 0
+                float drive:angular:physics:targetVelocity = 0
+            }
+
+            over "wheel2_joint"
+            {
+                float drive:angular:physics:damping = 20
+                float drive:angular:physics:stiffness = 0
+                float drive:angular:physics:targetPosition = 0
+                float drive:angular:physics:targetVelocity = 0
+            }
+
+            over "wheel3_joint"
+            {
+                float drive:angular:physics:damping = 20
+                float drive:angular:physics:stiffness = 0
+                float drive:angular:physics:targetPosition = 0
+                float drive:angular:physics:targetVelocity = 0
+            }
+
+            over "wheel4_joint"
+            {
+                float drive:angular:physics:damping = 20
+                float drive:angular:physics:stiffness = 0
+                float drive:angular:physics:targetPosition = 0
+                float drive:angular:physics:targetVelocity = 0
+            }
+        }
+
+        over "wheel_1" (
+            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+        )
+        {
+            float physxRigidBody:maxDepenetrationVelocity = 1
+            matrix4d xformOp:transform = ( (-0.7071066765757053, -0.7071067480216797, 0, 0), (0.7071067480216797, -0.7071066765757053, 0, 0), (0, 0, 1, 0), (0.31049300396442414, 0.17649300396442413, 0.14683399796485902, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        over "wheel_2" (
+            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+        )
+        {
+            float physxRigidBody:maxDepenetrationVelocity = 1
+            matrix4d xformOp:transform = ( (0.7071067450934194, -0.7071068030891894, 0, 0), (0.7071068030891894, 0.7071067450934194, 0, 0), (0, 0, 1, 0), (-0.042493003964424125, 0.17649300396442413, 0.14683399796485902, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        over "wheel_3" (
+            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+        )
+        {
+            float physxRigidBody:maxDepenetrationVelocity = 1
+            matrix4d xformOp:transform = ( (0.7071067450934194, 0.7071068030891894, 0, 0), (-0.7071068030891894, 0.7071067450934194, 0, 0), (0, 0, 1, 0), (-0.042493003964424125, -0.17649300396442413, 0.14683399796485902, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        over "wheel_4" (
+            prepend apiSchemas = ["PhysxRigidBodyAPI"]
+        )
+        {
+            float physxRigidBody:maxDepenetrationVelocity = 1
+            matrix4d xformOp:transform = ( (-0.7071066765757053, 0.7071067480216797, 0, 0), (-0.7071067480216797, -0.7071066765757053, 0, 0), (0, 0, 1, 0), (0.31049300396442414, -0.17649300396442413, 0.14683399796485902, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        over "OmniWheel_10"
+        {
+            over "wheel" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (-6.399214469432479e-8, 0.9999999025778604, 0, 0), (0, 0, 1, 0), (0.09475230995552056, -0.09475230740247419, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_0" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (-6.399214469432479e-8, 0.9999999025778604, 0, 0), (0, 0, 1, 0), (0.09475230835571691, -0.06975230946549868, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_1" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (-5.1770731923639346e-8, 0.8090169054136269, 0.5877852825623009, 0), (3.761364081311669e-8, -0.587785225299001, 0.8090169842297925, 0), (0.09475230866125225, -0.07452688505337261, 0.08969463109970094, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_2" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (-1.977466146385609e-8, 0.30901698379474873, 0.9510565125069093, 0), (6.086014586736965e-8, -0.951056419852949, 0.30901701389984737, 0), (0.09475230946115404, -0.08702688309053788, 0.09877641201019288, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_3" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (1.97746619079453e-8, -0.3090169908302082, 0.9510565125069093, 0), (6.086014586736965e-8, -0.951056419852949, -0.3090170209353076, 0), (0.09475231044988705, -0.10247773171441049, 0.09877641201019288, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_4" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (5.177073830742174e-8, -0.8090170057843866, 0.5877852258749137, 0), (3.761363720489186e-8, -0.5877851686116193, -0.809017084600562, 0), (0.09475231124978883, -0.11497772975157576, 0.08969463109970094, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_5" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (6.399214469432479e-8, -0.9999999025778604, -8.742277657347586e-8, 0), (-5.594370971542247e-15, 8.742276805656193e-8, -1, 0), (0.09475231155532421, -0.1197523053394497, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_6" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (5.1770723819011266e-8, -0.8090167790348669, -0.5877853024119872, 0), (-3.761364208987317e-8, 0.5877852451486855, -0.8090168578510202, 0), (0.09475231124978883, -0.11497772975157576, 0.06030536890029908, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_7" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (1.97746619079453e-8, -0.3090169908302082, -0.9510564160645671, 0), (-6.086013981665417e-8, 0.9510563234106162, -0.3090170209353076, 0), (0.09475231044988705, -0.10247773171441049, 0.05122358798980714, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_8" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (-1.9774670428907015e-8, 0.30901712393365066, -0.9510564861340214, 0), (-6.086014425754627e-8, 0.9510563934800637, 0.30901715403876295, 0), (0.09475230946115404, -0.08702688309053788, 0.05122358798980714, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_9" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778604, 6.399214469432479e-8, 0, 0), (-5.1770729592170994e-8, 0.8090168685759315, -0.5877853024119872, 0), (-3.761364208987317e-8, 0.5877852451486855, 0.8090169473920934, 0), (0.09475230866125225, -0.07452688505337261, 0.06030536890029908, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+        }
+
+        over "OmniWheel_11"
+        {
+            over "wheel" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (-1.0693285784624251e-7, 0.9999999899658061, 0, 0), (0, 0, 1, 0), (-0.0947522946611446, -0.09475232269684807, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_0" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (-1.0693285784624251e-7, 0.9999999899658061, 0, 0), (0, 0, 1, 0), (-0.09475229733446608, -0.06975232257517389, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_1" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (-8.651049820951329e-8, 0.8090169761119592, 0.5877852825623009, 0), (6.285356007884602e-8, -0.5877852766643494, 0.8090169842297925, 0), (-0.09475229682390704, -0.07452689858028823, 0.08969463109970094, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_2" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (-3.3044072422772075e-8, 0.3090170107991107, 0.9510565125069093, 0), (1.0169919090197155e-7, -0.9510565029638238, 0.30901701389984737, 0), (-0.0947522954872464, -0.08702689770980272, 0.09877641201019288, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_3" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (3.3044073172172617e-8, -0.30901701783457086, 0.9510565125069093, 0), (1.0169919090197155e-7, -0.9510565029638238, -0.3090170209353076, 0), (-0.0947522938350428, -0.10247774768389341, 0.09877641201019288, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_4" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (8.651050897867663e-8, -0.8090170764827277, 0.5877852258749137, 0), (6.285355402813053e-8, -0.5877852199769626, -0.809017084600562, 0), (-0.09475229249838218, -0.11497774681340792, 0.08969463109970094, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_5" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (1.0693285784624251e-7, -0.9999999899658061, -8.742277657347586e-8, 0), (-9.348367352764943e-15, 8.742277569625876e-8, -1, 0), (-0.09475229198782309, -0.11975232281852224, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_6" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (8.651048472030354e-8, -0.8090168497331882, -0.5877853024119872, 0), (-6.285356218826976e-8, 0.5877852965140355, -0.8090168578510202, 0), (-0.09475229249838218, -0.11497774681340792, 0.06030536890029908, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_7" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (3.3044073172172617e-8, -0.30901701783457086, -0.9510564160645671, 0), (-1.0169918057689742e-7, 0.9510564065214826, -0.3090170209353076, 0), (-0.0947522938350428, -0.10247774768389341, 0.05122358798980714, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_8" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (-3.304408743853848e-8, 0.3090171509380249, -0.9510564861340214, 0), (-1.0169918812641399e-7, 0.9510564765909362, 0.30901715403876295, 0), (-0.0947522954872464, -0.08702689770980272, 0.05122358798980714, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_9" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999899658061, 1.0693285784624251e-7, 0, 0), (-8.651049426822155e-8, 0.8090169392742604, -0.5877853024119872, 0), (-6.285356218826976e-8, 0.5877852965140355, 0.8090169473920934, 0), (-0.09475229682390704, -0.07452689858028823, 0.06030536890029908, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+        }
+
+        over "OmniWheel_12"
+        {
+            over "wheel" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (1.0693285701357524e-7, 0.999999989965806, 0, 0), (0, 0, 1, 0), (-0.09475229466114449, 0.0947523226968481, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_0" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (1.0693285701357524e-7, 0.999999989965806, 0, 0), (0, 0, 1, 0), (-0.09475229198782303, 0.11975232281852227, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_1" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (8.651049748786832e-8, 0.8090169761119592, 0.5877852825623009, 0), (-6.285355957924565e-8, -0.5877852766643494, 0.8090169842297925, 0), (-0.0947522924983821, 0.11497774681340799, 0.08969463109970094, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_2" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (3.3044072172971894e-8, 0.3090170107991107, 0.9510565125069093, 0), (-1.0169919012481543e-7, -0.9510565029638237, 0.30901701389984737, 0), (-0.09475229383504274, 0.10247774768389345, 0.09877641201019288, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_3" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (-3.304407295012801e-8, -0.30901701783457086, 0.9510565125069093, 0), (-1.0169919012481543e-7, -0.9510565029638237, -0.3090170209353076, 0), (-0.09475229548724626, 0.08702689770980276, 0.09877641201019288, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_4" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (-8.651050825703166e-8, -0.8090170764827277, 0.5877852258749137, 0), (-6.285355358404132e-8, -0.5877852199769626, -0.809017084600562, 0), (-0.0947522968239069, 0.07452689858028824, 0.08969463109970094, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_5" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (-1.0693285701357524e-7, -0.999999989965806, -8.742277657347586e-8, 0), (9.348367279973049e-15, 8.742277569625876e-8, -1, 0), (-0.09475229733446594, 0.06975232257517393, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_6" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (-8.651048405416972e-8, -0.809016849733188, -0.5877853024119872, 0), (6.285356174418055e-8, 0.5877852965140355, -0.8090168578510202, 0), (-0.0947522968239069, 0.07452689858028824, 0.06030536890029908, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_7" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (-3.304407295012801e-8, -0.30901701783457086, -0.9510564160645671, 0), (1.016991797997413e-7, 0.9510564065214826, -0.3090170209353076, 0), (-0.09475229548724626, 0.08702689770980276, 0.05122358798980714, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_8" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (3.304408716098273e-8, 0.3090171509380249, -0.9510564861340214, 0), (1.0169918723823557e-7, 0.9510564765909362, 0.30901715403876295, 0), (-0.09475229383504274, 0.10247774768389345, 0.05122358798980714, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_9" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.999999989965806, -1.0693285701357524e-7, 0, 0), (8.651049360208773e-8, 0.8090169392742604, -0.5877853024119872, 0), (6.285356174418055e-8, 0.5877852965140355, 0.8090169473920934, 0), (-0.0947522924983821, 0.11497774681340799, 0.06030536890029908, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+        }
+
+        over "OmniWheel_13"
+        {
+            over "wheel" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (6.399214413921328e-8, 0.9999999025778603, 0, 0), (0, 0, 1, 0), (0.09475230995552064, 0.0947523074024741, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_0" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (6.399214413921328e-8, 0.9999999025778603, 0, 0), (0, 0, 1, 0), (0.09475231155532426, 0.1197523053394496, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_1" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (5.1770731424038985e-8, 0.8090169054136269, 0.5877852825623009, 0), (-3.761364053556093e-8, -0.587785225299001, 0.8090169842297925, 0), (0.09475231124978889, 0.11497772975157568, 0.08969463109970094, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_2" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (1.9774661269567062e-8, 0.3090169837947487, 0.9510565125069093, 0), (-6.08601454787916e-8, -0.9510564198529489, 0.30901701389984737, 0), (0.09475231044988719, 0.10247773171441041, 0.09877641201019288, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_3" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (-1.9774661741411848e-8, -0.3090169908302082, 0.9510565125069093, 0), (-6.08601454787916e-8, -0.9510564198529489, -0.3090170209353076, 0), (0.0947523094611541, 0.08702688309053781, 0.09877641201019288, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_4" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (-5.177073786333253e-8, -0.8090170057843866, 0.5877852258749137, 0), (-3.76136369273361e-8, -0.5877851686116193, -0.809017084600562, 0), (0.0947523086612524, 0.07452688505337253, 0.08969463109970094, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_5" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (-6.399214413921328e-8, -0.9999999025778603, -8.742277657347586e-8, 0), (5.5943709186026876e-15, 8.74227680565619e-8, -1, 0), (0.09475230835571702, 0.06975230946549862, 0.07500000000000001, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_6" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (-5.1770723374922056e-8, -0.809016779034867, -0.5877853024119872, 0), (3.761364181231741e-8, 0.5877852451486854, -0.8090168578510202, 0), (0.0947523086612524, 0.07452688505337253, 0.06030536890029908, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_7" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (-1.9774661741411848e-8, -0.3090169908302082, -0.9510564160645671, 0), (6.086013926154266e-8, 0.9510563234106162, -0.3090170209353076, 0), (0.0947523094611541, 0.08702688309053781, 0.05122358798980714, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_8" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (1.9774670290129137e-8, 0.3090171239336506, -0.9510564861340214, 0), (6.086014370243475e-8, 0.9510563934800635, 0.30901715403876295, 0), (0.09475231044988719, 0.10247773171441041, 0.05122358798980714, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            over "wheel_passive_9" (
+                prepend apiSchemas = ["PhysxRigidBodyAPI"]
+            )
+            {
+                float physxRigidBody:maxDepenetrationVelocity = 1
+                matrix4d xformOp:transform = ( (0.9999999025778603, -6.399214413921328e-8, 0, 0), (5.177072909257063e-8, 0.8090168685759314, -0.5877853024119872, 0), (3.761364181231741e-8, 0.5877852451486854, 0.8090169473920934, 0), (0.09475231124978889, 0.11497772975157568, 0.06030536890029908, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+        }
+    }
+
+    over "Graph"
+    {
+        over "ROS_JointStates" (
+            active = false
+        )
+        {
+        }
+    }
+}
+

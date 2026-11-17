@@ -1,0 +1,545 @@
+{
+  "schema_version": 1,
+  "units": "m_kg_s",
+  "source": "project-authored parametric models",
+  "license": "project-local; no third-party meshes",
+  "physical_properties": "representative estimates",
+  "parameters": {
+    "dish": {
+      "diameter_m": 0.09,
+      "height_m": 0.016,
+      "wall_m": 0.001,
+      "mass_kg": 0.018
+    },
+    "lid": {
+      "inner_diameter_m": 0.0912,
+      "height_m": 0.012,
+      "wall_m": 0.0008,
+      "mass_kg": 0.014
+    },
+    "tube": {
+      "diameter_m": 0.016,
+      "height_m": 0.1,
+      "wall_m": 0.001,
+      "mass_kg": 0.008
+    },
+    "rack": {
+      "holes": 6,
+      "hole_diameter_m": 0.0166,
+      "pitch_m": 0.03,
+      "height_m": 0.05
+    },
+    "pipette": {
+      "capacity_ul": 200.0,
+      "plunger_stroke_m": 0.008,
+      "return_stiffness_n_m": 160.0,
+      "mass_kg": 0.085
+    },
+    "magnet": {
+      "capture_gap_m": 0.002,
+      "alignment_deg": 10.0,
+      "break_force_n": 150.0,
+      "break_torque_nm": 10.0,
+      "extension_m": 0.066,
+      "mass_kg": 0.05
+    },
+    "representative_bolt": {
+      "thread_diameter_m": 0.01,
+      "shaft_length_m": 0.035,
+      "mass_kg": 0.035
+    }
+  },
+  "assets": {
+    "bolt": {
+      "file": "bolt.usda",
+      "dimensions_m": [
+        0.017000000923871994,
+        0.017000000923871994,
+        0.04200000018253922
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.03500000014901161,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.025200000109523533
+        ]
+      },
+      "bounds_min": [
+        -0.008500000461935997,
+        -0.008500000461935997,
+        -7.450580430390374e-11
+      ],
+      "bounds_max": [
+        0.008500000461935997,
+        0.008500000461935997,
+        0.04200000010803342
+      ]
+    },
+    "dish": {
+      "file": "dish.usda",
+      "dimensions_m": [
+        0.09000474876722703,
+        0.09000474876722703,
+        0.015999999856110662
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.017999999225139618,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.009599999913666397
+        ]
+      },
+      "bounds_min": [
+        -0.045002374383613514,
+        -0.04500237438361352,
+        -2.374872564228636e-11
+      ],
+      "bounds_max": [
+        0.045002374383613514,
+        0.045002374383613514,
+        0.015999999832361937
+      ]
+    },
+    "pipette": {
+      "file": "pipette.usda",
+      "dimensions_m": [
+        0.02800000086426735,
+        0.03000000062212348,
+        0.1650000000745058
+      ],
+      "estimated_properties": true,
+      "mass_kg": null,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0.0,
+          0.0,
+          0.085
+        ],
+        "purpose": "body side pinch"
+      },
+      "bounds_min": [
+        -0.014000000432133675,
+        -0.014000000432133675,
+        -1.862645142292063e-10
+      ],
+      "bounds_max": [
+        0.014000000432133675,
+        0.016000000189989805,
+        0.1649999998882413
+      ]
+    },
+    "rack": {
+      "file": "rack.usda",
+      "dimensions_m": [
+        0.10200000037997961,
+        0.0729999989271164,
+        0.05000000013969838
+      ],
+      "estimated_properties": true,
+      "mass_kg": null,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.030000000083819027
+        ]
+      },
+      "bounds_min": [
+        -0.051000000189989805,
+        -0.0364999994635582,
+        -9.499490256914545e-11
+      ],
+      "bounds_max": [
+        0.051000000189989805,
+        0.0364999994635582,
+        0.05000000004470348
+      ]
+    },
+    "source_vessel": {
+      "file": "source_vessel.usda",
+      "dimensions_m": [
+        0.016009497482523064,
+        0.016009497482523064,
+        0.04500000077765435
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.02500000037252903,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.027000000466592608
+        ]
+      },
+      "bounds_min": [
+        -0.008004748741261532,
+        -0.008004748741261532,
+        -4.749745128457272e-11
+      ],
+      "bounds_max": [
+        0.008004748741261532,
+        0.008004748741261532,
+        0.0450000007301569
+      ]
+    },
+    "jig": {
+      "file": "jig.usda",
+      "dimensions_m": [
+        0.22499999403953552,
+        0.1599999964237213,
+        0.018000000078231097
+      ],
+      "estimated_properties": true,
+      "mass_kg": null,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.010800000046938658
+        ]
+      },
+      "bounds_min": [
+        -0.11249999701976776,
+        -0.07999999821186066,
+        -2.6077032026783353e-11
+      ],
+      "bounds_max": [
+        0.11249999701976776,
+        0.07999999821186066,
+        0.018000000052154064
+      ]
+    },
+    "tip_bin": {
+      "file": "tip_bin.usda",
+      "dimensions_m": [
+        0.046009497473650386,
+        0.046009497473650386,
+        0.04500000077765435
+      ],
+      "estimated_properties": true,
+      "mass_kg": null,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.027000000466592608
+        ]
+      },
+      "bounds_min": [
+        -0.023004748736825193,
+        -0.023004748736825193,
+        -4.749745128457272e-11
+      ],
+      "bounds_max": [
+        0.023004748736825193,
+        0.023004748736825193,
+        0.0450000007301569
+      ]
+    },
+    "fridge": {
+      "file": "fridge.usda",
+      "dimensions_m": [
+        0.6000000238418579,
+        0.6240000055730343,
+        1.100000023841858
+      ],
+      "estimated_properties": true,
+      "mass_kg": null,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.6600000143051147
+        ]
+      },
+      "bounds_min": [
+        -0.30000001192092896,
+        -0.3489999996125698,
+        -1.1920928910669204e-08
+      ],
+      "bounds_max": [
+        0.30000001192092896,
+        0.2750000059604645,
+        1.100000011920929
+      ],
+      "handle_frame": {
+        "xyz": [
+          0.22,
+          -0.34,
+          0.65
+        ]
+      }
+    },
+    "target_vessel": {
+      "file": "target_vessel.usda",
+      "dimensions_m": [
+        0.016009497482523064,
+        0.016009497482523064,
+        0.04500000077765435
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.02500000037252903,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.027000000466592608
+        ]
+      },
+      "bounds_min": [
+        -0.008004748741261532,
+        -0.008004748741261532,
+        -4.749745128457272e-11
+      ],
+      "bounds_max": [
+        0.008004748741261532,
+        0.008004748741261532,
+        0.0450000007301569
+      ]
+    },
+    "sample": {
+      "file": "sample.usda",
+      "dimensions_m": [
+        0.035999998450279236,
+        0.035999998450279236,
+        0.07600000017508864
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.03500000014901161,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.04560000010505318
+        ]
+      },
+      "bounds_min": [
+        -0.017999999225139618,
+        -0.017999999225139618,
+        -1.490116086078075e-10
+      ],
+      "bounds_max": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.07600000002607703
+      ]
+    },
+    "tip_holder": {
+      "file": "tip_holder.usda",
+      "dimensions_m": [
+        0.03999999910593033,
+        0.02800000086426735,
+        0.012000000104308128
+      ],
+      "estimated_properties": true,
+      "mass_kg": null,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.007200000062584876
+        ]
+      },
+      "bounds_min": [
+        -0.007999999552965164,
+        -0.008000000432133674,
+        -5.2154064053566707e-11
+      ],
+      "bounds_max": [
+        0.03199999955296516,
+        0.020000000432133673,
+        0.012000000052154064
+      ]
+    },
+    "tube": {
+      "file": "tube.usda",
+      "dimensions_m": [
+        0.016004748748938986,
+        0.016004748748938986,
+        0.09999999975552783
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.00800000037997961,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0.0,
+          0.0,
+          0.065
+        ],
+        "purpose": "side pinch above rack"
+      },
+      "bounds_min": [
+        -0.008002374374469493,
+        -0.008002374374469493,
+        -2.374872564228636e-11
+      ],
+      "bounds_max": [
+        0.008002374374469493,
+        0.008002374374469493,
+        0.0999999997317791
+      ]
+    },
+    "lid": {
+      "file": "lid.usda",
+      "dimensions_m": [
+        0.09280379893533602,
+        0.09940189949374505,
+        0.03800000023841858
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.014000000432133675,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0.0,
+          -0.05,
+          0.031
+        ],
+        "purpose": "parallel pinch of handling clip"
+      },
+      "bounds_min": [
+        -0.04640189946766801,
+        -0.053000000026077035,
+        2.980232206850619e-11
+      ],
+      "bounds_max": [
+        0.04640189946766801,
+        0.04640189946766801,
+        0.0380000002682209
+      ]
+    },
+    "tip": {
+      "file": "tip.usda",
+      "dimensions_m": [
+        0.007002374369743498,
+        0.007002374369743498,
+        0.0400000009208452
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.0005000000237487257,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.02400000055250712
+        ]
+      },
+      "bounds_min": [
+        -0.003501187184871749,
+        -0.0035011871848717496,
+        -1.187436282114318e-11
+      ],
+      "bounds_max": [
+        0.003501187184871749,
+        0.003501187184871749,
+        0.04000000090897084
+      ]
+    },
+    "tube_stand": {
+      "file": "tube_stand.usda",
+      "dimensions_m": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.05000000074505806
+      ],
+      "estimated_properties": true,
+      "mass_kg": null,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.030000000447034835
+        ]
+      },
+      "bounds_min": [
+        -0.019999999552965164,
+        -0.019999999552965164,
+        -3.725290284584126e-10
+      ],
+      "bounds_max": [
+        0.019999999552965164,
+        0.019999999552965164,
+        0.05000000037252903
+      ]
+    },
+    "insert_clearance": {
+      "file": "insert_clearance.usda",
+      "dimensions_m": [
+        0.019750000908970833,
+        0.019743718206882477,
+        0.023099999874830246
+      ],
+      "estimated_properties": true,
+      "mass_kg": 0.01042999979108572,
+      "collision": "32 convex annular sectors plus analytic bottom; opening retained",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.013859999924898147
+        ]
+      },
+      "bounds_min": [
+        -0.009875000454485416,
+        -0.009873994626104832,
+        -0.023099999874830246
+      ],
+      "bounds_max": [
+        0.009875000454485416,
+        0.009869723580777645,
+        0.0
+      ],
+      "source": "HTR_Insert.stp visual; STEP-derived hollow collision proxy",
+      "visual_diameter_mm": 19.75,
+      "collision_outer_diameter_mm": 19.55,
+      "collision_inner_diameter_mm": 12.25,
+      "clearance_status": "estimated outer clearance; replace with measured fit"
+    },
+    "pipette_holder": {
+      "file": "pipette_holder.usda",
+      "dimensions_m": [
+        0.07000000029802322,
+        0.07000000029802322,
+        0.10700000109896063
+      ],
+      "estimated_properties": true,
+      "mass_kg": null,
+      "collision": "analytic hollow multi-primitive",
+      "grasp_frame": {
+        "xyz": [
+          0,
+          0,
+          0.06420000065937638
+        ]
+      },
+      "bounds_min": [
+        -0.03500000014901161,
+        -0.03500000014901161,
+        -2.6077032026783353e-11
+      ],
+      "bounds_max": [
+        0.03500000014901161,
+        0.03500000014901161,
+        0.1070000010728836
+      ]
+    }
+  }
+}
