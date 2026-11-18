@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="pipette_gilson_articulated_prototype_v1">
+  <link name="pipette_body">
+    <inertial>
+      <origin xyz="0.0046425609897986966 -5.961511473591084e-05 0.028745950911674065" rpy="0 0 0" />
+      <mass value="0.1812351273549834" />
+      <inertia ixx="0.00063203026974113731" ixy="1.4450843144078876e-08" ixz="-9.9342035266509313e-06" iyy="0.00064135473054091944" iyz="-4.3210767012645174e-07" izz="3.4833136675718408e-05" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="body_visual.glb" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="collision_geometry_7.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="collision_geometry_6.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="collision_geometry_5.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="collision_geometry_4.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="collision_geometry_3.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="collision_geometry_2.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="collision_geometry_1.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="pipette_plunger">
+    <inertial>
+      <origin xyz="-0.00043735649337041892 4.2728468976444391e-05 0.13141593070302984" rpy="0 0 0" />
+      <mass value="0.011168679805513497" />
+      <inertia ixx="1.0151471791953687e-06" ixy="-1.2326650170017178e-09" ixz="-1.6279444239266784e-09" iyy="1.0049321189340861e-06" iyz="2.5464375022504828e-09" izz="8.137475795096404e-07" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="plunger_visual.glb" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="collision_geometry_0.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="pipette_plunger_slide" type="prismatic">
+    <parent link="pipette_body" />
+    <child link="pipette_plunger" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="-0.10617366432361183 -0.027149464925803914 -0.99397689085729735" />
+    <limit lower="0" upper="0.016" effort="10" velocity="0.2" />
+    <dynamics damping="0" friction="0" />
+  </joint>
+</robot>
