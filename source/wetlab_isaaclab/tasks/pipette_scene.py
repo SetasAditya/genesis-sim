@@ -24,6 +24,7 @@ def cabinet_pipette_scene_cfg(
     import isaaclab.sim as sim_utils
     from isaaclab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
     from isaaclab.scene import InteractiveSceneCfg
+    from isaaclab.sensors import ContactSensorCfg
     from isaaclab.utils import configclass
 
     from wetlab_isaaclab.equipment.gilson_pipette import gilson_pipette_cfg
@@ -40,6 +41,21 @@ def cabinet_pipette_scene_cfg(
             ),
         )
 
+    def body_paths(usd, instance, accepts):
+        from pxr import Usd, UsdPhysics
+
+        stage = Usd.Stage.Open(str(usd))
+        root = stage.GetDefaultPrim()
+        prefix = str(root.GetPath())
+        return [
+            f"{{ENV_REGEX_NS}}/{instance}" + str(prim.GetPath())[len(prefix):]
+            for prim in Usd.PrimRange(root)
+            if accepts(prim.GetName()) and prim.HasAPI(UsdPhysics.RigidBodyAPI)
+        ]
+
+    hand_paths = body_paths(robot.spawn.usd_path, "Robot", lambda name: name.startswith("rl_dg_"))
+    plunger_path, = body_paths(pipette_usd, "Pipette", lambda name: name == "pipette_plunger")
+
     @configclass
     class CabinetPipetteSceneCfg(InteractiveSceneCfg):
         robot: ArticulationCfg | None = None
@@ -47,6 +63,7 @@ def cabinet_pipette_scene_cfg(
         pipette: ArticulationCfg | None = None
         cabinet: RigidObjectCfg | None = None
         tube: RigidObjectCfg | None = None
+        press_contact: ContactSensorCfg | None = None
 
     return CabinetPipetteSceneCfg(
         robot=robot,
@@ -56,6 +73,10 @@ def cabinet_pipette_scene_cfg(
         ),
         cabinet=fixture("Cabinet", cabinet_usd, layout.cabinet),
         tube=fixture("Tube", tube_usd, layout.tube),
+        press_contact=ContactSensorCfg(
+            prim_path=plunger_path, filter_prim_paths_expr=hand_paths,
+            track_friction_forces=True, max_contact_data_count_per_prim=256,
+        ) if hand_paths else None,
         num_envs=num_envs,
         env_spacing=env_spacing,
     )

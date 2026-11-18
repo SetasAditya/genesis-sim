@@ -17,7 +17,8 @@ class PipetteLayout:
     """
 
     cabinet: Pose = (0.05770144, -0.36297586, 0.0, 0.85552198, 0.0, 0.0, -0.51776650)
-    pipette: Pose = (-0.01376520, -0.36329683, 0.17895555, 0.82181138, 0.06757437, 0.15804152, -0.54321509)
+    # The nominal robot-home reset leaves the pipette resting on the shelf.
+    pipette: Pose = (0.00899869, -0.26995413, 0.296335, 0.60494539, 0.60494539, -0.36611620, -0.36611620)
     tube: Pose = (0.15535563, -0.39385803, 0.0, 0.98822186, 0.0, 0.0, -0.15302796)
     randomize: bool = True
     xy_half_range_m: tuple[float, float] = (0.01, 0.01)

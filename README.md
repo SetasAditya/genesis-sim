@@ -8,6 +8,37 @@ training are not qualified.
 
 ![Wet-lab overview](assets/previews/overview.png)
 
+## Cabinet pipette task
+
+This task is separate from the Galbot wet-lab sandbox. It provides a cabinet,
+tube and spring-return pipette, and supports the mounted DexMate + DG-5F and
+floating DG-5F. The handless Vega-1 is available for robot and scene inspection.
+
+Use Isaac Sim 6.1 with Isaac Lab 3 and a GPU. Convert the sources into a new
+cache on the first run. The converter preserves the hand collision pieces,
+writes pair exclusions into each robot asset and supplies positive inertias
+for the six virtual links of the floating robot.
+
+```bash
+python -m pip install -e '.[cabinet]'
+python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --prepare --num-envs 2
+python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --robot floating --fixed-layout
+```
+
+The default reset samples a pool of cabinet positions and yaw angles with
+independent tube offsets. Each generated layout is screened for tube-to-cabinet
+clearance and wrist reach at two approach points. Full hand and arm path
+clearance depends on the controller and the deployment layout. The fixed switch
+uses the nominal work surface and shelf pose. Pass a custom work surface and
+layout to `cabinet_pipette_scene_cfg` to change the deployment scene.
+
+Use `reset_cabinet_pipette` for indexed resets, the articulation command API
+or the robot action configs to control the robot, and `CabinetPipetteTask.observe`
+and `CabinetPipetteTask.update` for physical observations and event outcomes.
+The launcher's wrist movement is a scene smoke test. The task reports the
+physical conditions for alignment and sustained pressing without a controller
+or a training objective.
+
 ## Equipment
 
 | Task | Included assets |
