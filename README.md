@@ -10,40 +10,50 @@ training are not qualified.
 
 ## Cabinet pipette task
 
-This task is separate from the Galbot wet-lab sandbox. It provides a cabinet,
-tube and spring-return pipette, and supports the mounted DexMate + DG-5F and
-floating DG-5F. The handless Vega-1 is available for robot and scene inspection.
+The cabinet task provides a spring-return Gilson pipette, cabinet shelf and
+test tube. Choose `--robot mounted` (DexMate + DG-5F, the default),
+`--robot floating` (floating DG-5F), or `--robot vega` (handless DexMate for
+robot and scene inspection).
 
-Use Isaac Sim 6.1 with Isaac Lab 3 and a GPU. Convert the sources into a new
-cache on the first run. The converter preserves the hand collision pieces,
-writes pair exclusions into each robot asset and supplies positive inertias
-for the six virtual links of the floating robot.
+Use Isaac Sim 6.1, Isaac Lab 3 and an NVIDIA GPU. Set up a new asset cache once
+with `--prepare`, then reuse it. The converter preserves the hand collision
+pieces, authors pair exclusions, and supplies positive inertias for the six
+floating-hand virtual links. Reconvert older caches to include the robot and
+pipette visual meshes.
 
 ```bash
 python -m pip install -e '.[cabinet]'
+export OMNI_KIT_ACCEPT_EULA=YES
 python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --prepare --num-envs 2
 python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --robot floating --fixed-layout
-python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --fixed-layout --rgb outputs/cabinet.png
+python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --robot mounted --fixed-layout \
+  --rgb outputs/cabinet.png --kit_args="--/renderer/multiGpu/enabled=false --/app/asyncRendering=false"
 ```
 
-The `--rgb` option enables Isaac RTX camera observations and writes one PNG
-per environment. Allow extra startup time on a cold renderer. Reconvert older
-asset caches to populate the GLB visual sites. The importer uses staged OBJ
-visual geometry without GLB textures. Collision assets are unchanged.
+**Reset and control.** By default, `--seed` controls placement sampling for
+cabinet XY and yaw and independent tube XY. The pipette moves with the cabinet
+shelf. The sampler screens fixture clearance and reach at two approach points.
+Use `--fixed-layout` for the nominal layout. Pass a custom layout and work
+surface to `cabinet_pipette_scene_cfg` for a different deployment, then use
+`reset_cabinet_pipette` for indexed resets. Control the robots through Isaac
+Lab's articulation commands or the action configs in `wetlab_isaaclab.robots.actions`.
 
-The default reset samples a pool of cabinet positions and yaw angles with
-independent tube offsets. Each generated layout is screened for tube-to-cabinet
-clearance and wrist reach at two approach points. Full hand and arm path
-clearance depends on the controller and the deployment layout. The fixed switch
-uses the nominal work surface and shelf pose. Pass a custom work surface and
-layout to `cabinet_pipette_scene_cfg` to change the deployment scene.
+**Observations and events.** The launcher prints `event_outcomes`, with one
+Boolean per world for each event. From Python, use `CabinetPipetteTask.observe()`
+to read robot state, poses, plunger travel and axial contact force. Call
+`task.reset(env_ids)` after resetting those worlds and `task.update()` once per
+control (20 Hz in the example). It returns `valid`, `fixture_stable`,
+`goal_reached`, `aligned`, `sustained_press`, and `success`.
+Success requires a valid state, stable fixture, goal and tube alignment, and a
+continuous one-second press hold with at least 15 mm travel and over 0.1 N
+axial force. The launcher's small joint command checks scene stepping. A caller
+supplies the manipulation controller.
 
-Use `reset_cabinet_pipette` for indexed resets, the articulation command API
-or the robot action configs to control the robot, and `CabinetPipetteTask.observe`
-and `CabinetPipetteTask.update` for physical observations and event outcomes.
-The launcher's wrist movement is a scene smoke test. The task reports the
-physical conditions for alignment and sustained pressing without a controller
-or a training objective.
+**Camera.** `--rgb` enables native Isaac RTX RGB and writes one 640×480 PNG per
+environment. The first verified camera launch took about 220 seconds on an
+RTX 4090 with an X11 display available. Allow several minutes for startup.
+Visual conversion preserves mesh geometry and uses OBJ without the source GLB
+textures.
 
 ## Equipment
 
