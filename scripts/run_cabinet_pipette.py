@@ -125,7 +125,7 @@ try:
         from PIL import Image
 
         camera = scene["inspection_camera"]
-        eye, target_point = (1.41, -1.94, 0.96), (0.08, -0.24, 0.14)
+        eye, target_point = (1.53, -2.11, 1.12), (0.08, -0.24, 0.24)
         origin = scene.env_origins
         camera.set_world_poses_from_view(origin + origin.new_tensor(eye), origin + origin.new_tensor(target_point))
         for _ in range(6):

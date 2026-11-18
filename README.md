@@ -37,8 +37,8 @@ wrist reach at the approach points. Use `--fixed-pipette` or `--fixed-tube`
 to disable either randomizer, or `--fixed-layout` to disable both. `--seed`
 sets the placement seed.
 
-The frame is 1.20 m wide by 0.36 m deep by 0.78 m high, with the shelf
-0.275 m above the bench top. The bench is 1.55 m wide by 0.86 m deep by
+The frame is 1.20 m wide by 0.36 m deep by 1.00 m high, with the shelf
+0.45 m above the bench top. The bench is 1.55 m wide by 0.86 m deep by
 0.865 m high. These are estimates. Change the dimensions, nominal poses
 and randomization ranges with `PipetteLayout`, `ShelfFrame` and `LabBench`.
 Pass the layout to `cabinet_pipette_scene_cfg` and use

@@ -9,8 +9,8 @@ class ShelfFrame:
 
     width: float = 1.20
     depth: float = 0.36
-    height: float = 0.78
-    shelf_top: float = 0.275
+    height: float = 1.00
+    shelf_top: float = 0.45
     shelf_thickness: float = 0.024
     post_width: float = 0.027
 
