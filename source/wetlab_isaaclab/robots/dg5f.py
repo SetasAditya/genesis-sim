@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from isaaclab.assets import ArticulationCfg
 
 MOUNTED_PALM_LINK = "rl_dg_mount"
-FLOATING_PALM_LINK = "base_link"
+FLOATING_PALM_LINK = "rl_dg_mount"
 
 
 def dg5f_robot_cfg(
@@ -44,14 +44,13 @@ def dg5f_robot_cfg(
 def author_dg5f_collision_filters(stage, root_path: str, *, floating: bool = False) -> int:
     """Author pair exclusions on the converted source USD before cloning.
 
-    This requires an editable stage and separate, named link prims. The floating
-    palm is named base_link rather than rl_dg_mount in the mounted model.
+    This requires an editable stage and separate, named link prims. The
+    plain base_link in the floating model precedes the physical mount.
     """
     pairs = json.loads(ROBOT_CONTRACT.read_text())["excluded_pairs"]
     if floating:
         pairs = [
-            [("base_link" if name == "rl_dg_mount" else name) for name in pair]
-            for pair in pairs
+            pair for pair in pairs
             if all(name.startswith("rl_dg_") for name in pair)
         ]
     return _author_collision_filters(stage, root_path, pairs)

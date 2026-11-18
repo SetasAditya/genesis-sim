@@ -9,5 +9,8 @@ description = "Isaac Lab mobile-manipulation environments for the HTR wet-lab wo
 requires-python = ">=3.11"
 dependencies = ["numpy", "opencv-python", "scipy>=1.11"]
 
+[project.optional-dependencies]
+cabinet = ["trimesh>=4.2"]
+
 [tool.setuptools.packages.find]
 where = ["source"]
