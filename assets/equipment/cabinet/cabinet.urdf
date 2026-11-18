@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="open_wall_mounted_cabinet">
+  <link name="cabinet">
+    <visual name="flat_shelf">
+      <origin xyz="-0.1335 0.0 0.272" rpy="0 0 0" />
+      <geometry>
+        <box size="0.23299999999999998 0.34 0.006000000000000005" />
+      </geometry>
+      <material name="cabinet">
+        <color rgba=".66 .46 .28 1" />
+      </material>
+    </visual>
+    <collision name="flat_shelf">
+      <origin xyz="-0.1335 0.0 0.272" rpy="0 0 0" />
+      <geometry>
+        <box size="0.23299999999999998 0.34 0.006000000000000005" />
+      </geometry>
+    </collision>
+    <visual name="cabinet_back">
+      <origin xyz="-0.2441 0.0 0.1345" rpy="0 0 0" />
+      <geometry>
+        <box size="0.01200000000000001 0.34 0.269" />
+      </geometry>
+      <material name="cabinet">
+        <color rgba=".84 .86 .88 1" />
+      </material>
+    </visual>
+    <collision name="cabinet_back">
+      <origin xyz="-0.244 0.0 0.1345" rpy="0 0 0" />
+      <geometry>
+        <box size="0.01200000000000001 0.34 0.269" />
+      </geometry>
+    </collision>
+    <visual name="upper_back">
+      <origin xyz="-0.232 0 0.425" rpy="0 0 0" />
+      <geometry>
+        <box size="0.012 0.364 0.3" />
+      </geometry>
+      <material name="upper_back_material">
+        <color rgba="0.76 0.63 0.46 1" />
+      </material>
+    </visual>
+    <collision name="upper_back">
+      <origin xyz="-0.232 0 0.425" rpy="0 0 0" />
+      <geometry>
+        <box size="0.012 0.364 0.3" />
+      </geometry>
+    </collision>
+    <visual name="left_side">
+      <origin xyz="-0.1335 -0.176 0.425" rpy="0 0 0" />
+      <geometry>
+        <box size="0.233 0.012 0.3" />
+      </geometry>
+      <material name="left_side_material">
+        <color rgba="0.66 0.46 0.28 1" />
+      </material>
+    </visual>
+    <collision name="left_side">
+      <origin xyz="-0.1335 -0.176 0.425" rpy="0 0 0" />
+      <geometry>
+        <box size="0.233 0.012 0.3" />
+      </geometry>
+    </collision>
+    <visual name="right_side">
+      <origin xyz="-0.1335 0.176 0.425" rpy="0 0 0" />
+      <geometry>
+        <box size="0.233 0.012 0.3" />
+      </geometry>
+      <material name="right_side_material">
+        <color rgba="0.66 0.46 0.28 1" />
+      </material>
+    </visual>
+    <collision name="right_side">
+      <origin xyz="-0.1335 0.176 0.425" rpy="0 0 0" />
+      <geometry>
+        <box size="0.233 0.012 0.3" />
+      </geometry>
+    </collision>
+    <visual name="top">
+      <origin xyz="-0.1335 0 0.581" rpy="0 0 0" />
+      <geometry>
+        <box size="0.233 0.364 0.012" />
+      </geometry>
+      <material name="top_material">
+        <color rgba="0.66 0.46 0.28 1" />
+      </material>
+    </visual>
+    <collision name="top">
+      <origin xyz="-0.1335 0 0.581" rpy="0 0 0" />
+      <geometry>
+        <box size="0.233 0.364 0.012" />
+      </geometry>
+    </collision>
+    <visual name="mounting_wall">
+      <origin xyz="-0.248 0 0.575" rpy="0 0 0" />
+      <geometry>
+        <box size="0.02 1.2 1.15" />
+      </geometry>
+      <material name="mounting_wall_material">
+        <color rgba="0.84 0.86 0.88 1" />
+      </material>
+    </visual>
+    <collision name="mounting_wall">
+      <origin xyz="-0.248 0 0.575" rpy="0 0 0" />
+      <geometry>
+        <box size="0.02 1.2 1.15" />
+      </geometry>
+    </collision>
+  </link>
+</robot>
