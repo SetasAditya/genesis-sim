@@ -43,7 +43,7 @@ def dg5f_robot_cfg(
     position: tuple[float, float, float] = (0.0, 0.0, 0.0),
     orientation: tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0),
 ) -> "ArticulationCfg":
-    """Configure a converted DG-5F USD with named links and a fixed articulation root."""
+    """Configure a fixed-root DG-5F USD. The input orientation is WXYZ."""
     import isaaclab.sim as sim_utils
     from isaaclab.assets import ArticulationCfg
 
@@ -78,7 +78,7 @@ def dg5f_robot_cfg(
         prim_path=prim_path,
         spawn=spawn,
         init_state=ArticulationCfg.InitialStateCfg(
-            pos=position, rot=orientation, joint_pos=home, joint_vel={".*": 0.0}
+            pos=position, rot=(*orientation[1:], orientation[0]), joint_pos=home, joint_vel={".*": 0.0}
         ),
         actuators={name: _actuator(rows) for name, rows in groups.items()},
     )

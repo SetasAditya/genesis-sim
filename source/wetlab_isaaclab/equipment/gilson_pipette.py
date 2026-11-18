@@ -27,7 +27,7 @@ def gilson_pipette_cfg(
     """Configure a free-root USD with the two prototype links and slide joint.
 
     The USD supplies the link frames, masses, collision shapes and joint limits.
-    The scene owns the initial placement and contact material.
+    The scene owns the initial placement and contact material. The input orientation is WXYZ.
     """
     usd = Path(usd_path).expanduser().resolve(strict=True)
     if not usd.is_file() or usd.suffix.lower() not in {".usd", ".usda", ".usdc"}:
@@ -46,7 +46,7 @@ def gilson_pipette_cfg(
         ),
         init_state=ArticulationCfg.InitialStateCfg(
             pos=position,
-            rot=orientation,
+            rot=(*orientation[1:], orientation[0]),
             joint_pos={PLUNGER_JOINT: 0.0},
             joint_vel={PLUNGER_JOINT: 0.0},
         ),
