@@ -15,10 +15,11 @@ parser.add_argument("--steps", type=int, default=50, help="Number of 100 Hz simu
 parser.add_argument("--assets", type=Path, required=True, help="Converted asset cache directory")
 parser.add_argument("--prepare", action="store_true", help="Convert the sources into a new asset cache")
 parser.add_argument("--state-output", type=Path, help="Write the final native link poses for inspection")
+parser.add_argument("--rgb", type=Path, help="Save a native cabinet camera PNG")
 AppLauncher.add_app_launcher_args(parser)
 parser.add_argument("--headless", action="store_true")
 args = parser.parse_args()
-launcher = AppLauncher(args)
+launcher = AppLauncher(args, enable_cameras=args.rgb is not None)
 
 try:
     import torch
@@ -38,8 +39,8 @@ try:
     if args.prepare:
         paths = prepare_pipette_assets(args.assets)
     else:
-        paths = {directory.name: next(directory.glob("*/*.usda"))
-                 for directory in args.assets.iterdir() if directory.is_dir() and directory.name != "dg5f_source"}
+        paths = {name: next((args.assets / name).glob("*/*.usda"))
+                 for name in (args.robot, "pipette", "cabinet", "tube")}
 
     sim = SimulationContext(SimulationCfg(
         device=args.device, dt=0.01, physics=PhysxCfg(solver_type=1, bounce_threshold_velocity=2.0),
@@ -69,11 +70,23 @@ try:
         init_state=AssetBaseCfg.InitialStateCfg(pos=(-0.12592294, 0.01567858, -0.02189519)),
     )
 
-    scene = InteractiveScene(cabinet_pipette_scene_cfg(
+    scene_cfg = cabinet_pipette_scene_cfg(
         robot=robot, pipette_usd=paths["pipette"], cabinet_usd=paths["cabinet"],
         tube_usd=paths["tube"], work_surface=table, num_envs=args.num_envs,
         env_spacing=3.0, layout=layout,
-    ))
+    )
+    if args.rgb:
+        from isaaclab.sensors import CameraCfg
+        from isaaclab.sim import DomeLightCfg, PinholeCameraCfg
+
+        scene_cfg.inspection_camera = CameraCfg(
+            prim_path="{ENV_REGEX_NS}/InspectionCamera", width=640, height=480,
+            data_types=["rgb"], spawn=PinholeCameraCfg(focal_length=24, horizontal_aperture=25),
+        )
+        scene_cfg.inspection_light = AssetBaseCfg(
+            prim_path="/World/InspectionLight", spawn=DomeLightCfg(intensity=1600),
+        )
+    scene = InteractiveScene(scene_cfg)
     sim.reset()
     ids = torch.arange(args.num_envs, device=scene.device)
     rng = torch.Generator(device=scene.device).manual_seed(args.seed)
@@ -90,7 +103,7 @@ try:
     scene["robot"].actuators.target_command.set_position_index(value=target)
     for step in range(args.steps):
         scene.write_data_to_sim()
-        sim.step()
+        sim.step(render=args.rgb is None)
         scene.update(0.01)
         if (step + 1) % 5 == 0:
             outcomes = task.update()
@@ -103,6 +116,28 @@ try:
         raise RuntimeError("Nonfinite scene state")
     motion = actual[:, joint_id] - scene["robot"].data.default_joint_pos.torch[:, joint_id]
     print(f"robot={args.robot} worlds={args.num_envs} pipette_displacement_m={displacement.tolist()} joint_delta={motion.tolist()}", flush=True)
+    if args.rgb:
+        from PIL import Image
+
+        camera = scene["inspection_camera"]
+        if args.robot == "floating":
+            eye, target_point = (0.62, -1.02, 0.55), (0.00, -0.46, 0.24)
+        else:
+            eye, target_point = (1.02, -1.28, 0.58), (0.17, -0.57, 0.22)
+        origin = scene.env_origins
+        camera.set_world_poses_from_view(origin + origin.new_tensor(eye), origin + origin.new_tensor(target_point))
+        for _ in range(6):
+            sim.render()
+            camera.update(0.01, force_recompute=True)
+        rgb = camera.data.output["rgb"].torch[..., :3].cpu().numpy()
+        print(f"CAMERA_SHAPE {rgb.shape}", flush=True)
+        if rgb.shape != (args.num_envs, 480, 640, 3) or any(float(frame.std()) < 2 for frame in rgb):
+            raise RuntimeError("Cabinet RGB camera did not produce a usable image for every world")
+        args.rgb.parent.mkdir(parents=True, exist_ok=True)
+        for index, frame in enumerate(rgb):
+            path = args.rgb if index == 0 else args.rgb.with_name(f"{args.rgb.stem}_env{index}{args.rgb.suffix}")
+            Image.fromarray(frame).save(path)
+        print("CABINET_RGB_PASS", flush=True)
     if args.state_output:
         import json
 

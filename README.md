@@ -23,7 +23,13 @@ for the six virtual links of the floating robot.
 python -m pip install -e '.[cabinet]'
 python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --prepare --num-envs 2
 python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --robot floating --fixed-layout
+python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets --fixed-layout --rgb outputs/cabinet.png
 ```
+
+The `--rgb` option enables Isaac RTX camera observations and writes one PNG
+per environment. Allow extra startup time on a cold renderer. Reconvert older
+asset caches to populate the GLB visual sites. The importer uses staged OBJ
+visual geometry without GLB textures. Collision assets are unchanged.
 
 The default reset samples a pool of cabinet positions and yaw angles with
 independent tube offsets. Each generated layout is screened for tube-to-cabinet

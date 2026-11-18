@@ -2,10 +2,36 @@
 
 from copy import deepcopy
 from pathlib import Path
-from shutil import copytree
+from shutil import copyfile, copytree
 from xml.etree import ElementTree as ET
 
 from wetlab_isaaclab.assets import ASSET_ROOT
+
+
+def _stage_visual_meshes(urdf):
+    import trimesh
+
+    model = ET.parse(urdf)
+    for visual in model.findall("link/visual"):
+        mesh = visual.find("geometry/mesh")
+        if mesh is None:
+            continue
+        original = Path(mesh.get("filename"))
+        if original.suffix.lower() not in (".glb", ".gltf"):
+            continue
+        # The URDF importer leaves these GLB visual sites empty. Convert only
+        # visuals and keep all authored collision geometry as it is.
+        obj = original.with_suffix(".visual.obj")
+        destination = urdf.parent / obj
+        if not destination.exists():
+            geometry = trimesh.load_mesh(urdf.parent / original, process=False)
+            if not len(geometry.faces):
+                raise ValueError(f"Missing triangles in visual {original}")
+            destination.write_text(trimesh.exchange.obj.export_obj(
+                geometry, include_texture=False, include_color=False, digits=12,
+            ))
+        mesh.set("filename", obj.as_posix())
+    model.write(urdf, encoding="utf-8", xml_declaration=True)
 
 
 def _stage_dg5f_sources(directory):
@@ -43,6 +69,7 @@ def _stage_dg5f_sources(directory):
                     piece.find("geometry/mesh").set("filename", name)
                     link.insert(index + offset, piece)
         model.write(path, encoding="utf-8", xml_declaration=True)
+        _stage_visual_meshes(path)
 
 
 def prepare_pipette_assets(output: Path) -> dict[str, Path]:
@@ -55,14 +82,22 @@ def prepare_pipette_assets(output: Path) -> dict[str, Path]:
 
     output = output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    staged = output / "dg5f_source"
+    stage_root = output / "source"
+    staged = stage_root / "dexmate_dg5f"
     _stage_dg5f_sources(staged)
     equipment = ASSET_ROOT / "equipment"
+    vega = stage_root / "vega_1" / VEGA_1_URDF.name
+    vega.parent.mkdir()
+    copyfile(VEGA_1_URDF, vega)
+    _stage_visual_meshes(vega)
+    pipette = stage_root / "gilson_pipette" / "pipette_gilson_articulated.urdf"
+    copytree(equipment / "gilson_pipette", pipette.parent)
+    _stage_visual_meshes(pipette)
     sources = {
         "mounted": (staged / "whole_robot.urdf", True),
         "floating": (staged / "simulation.urdf", True),
-        "vega": (VEGA_1_URDF, True),
-        "pipette": (equipment / "gilson_pipette/pipette_gilson_articulated.urdf", False),
+        "vega": (vega, True),
+        "pipette": (pipette, False),
         "cabinet": (equipment / "cabinet/cabinet.urdf", False),
         "tube": (equipment / "test_tube/test_tube.urdf", False),
     }
