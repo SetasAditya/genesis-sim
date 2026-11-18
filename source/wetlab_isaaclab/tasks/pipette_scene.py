@@ -59,3 +59,39 @@ def cabinet_pipette_scene_cfg(
         num_envs=num_envs,
         env_spacing=env_spacing,
     )
+
+
+def reset_cabinet_pipette(scene, env_ids, layout: PipetteLayout, *, generator=None):
+    """Reset selected worlds to the robot home and the sampled equipment poses."""
+    from wetlab_isaaclab.equipment.gilson_pipette import set_spring_preload
+
+    poses = layout.sample(len(env_ids), device=scene.device, generator=generator)
+    relative_poses = {
+        name: pose[:, (0, 1, 2, 4, 5, 6, 3)] for name, pose in poses.items()
+    }
+
+    state = {"articulation": {}, "rigid_object": {}}
+    for name, asset in scene.articulations.items():
+        data = asset.data
+        state["articulation"][name] = {
+            "root_pose": (
+                relative_poses["pipette"] if name == "pipette"
+                else data.default_root_pose.torch[env_ids]
+            ),
+            "root_velocity": data.default_root_vel.torch[env_ids],
+            "joint_position": data.default_joint_pos.torch[env_ids],
+            "joint_velocity": data.default_joint_vel.torch[env_ids],
+        }
+
+    for name, asset in scene.rigid_objects.items():
+        data = asset.data
+        root_pose = relative_poses.get(name)
+        state["rigid_object"][name] = {
+            "root_pose": data.default_root_pose.torch[env_ids] if root_pose is None else root_pose,
+            "root_velocity": data.default_root_vel.torch[env_ids],
+        }
+
+    scene.reset(env_ids)
+    scene.reset_to(state, env_ids=env_ids, is_relative=True)
+    set_spring_preload(scene["pipette"], env_ids)
+    scene.write_data_to_sim()
