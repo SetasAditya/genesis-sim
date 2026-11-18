@@ -38,7 +38,15 @@ def dg5f_robot_cfg(
     else:
         groups = {"body": [row for row in mounted if row not in fingers], "fingers": fingers}
 
-    return _articulation_cfg(usd_path, prim_path, position, orientation, groups)
+    cfg = _articulation_cfg(usd_path, prim_path, position, orientation, groups)
+    if floating:
+        # Regularize the nearly massless virtual chain in PhysX joint space.
+        # The physical hand keeps its own masses, inertias, and drive gains.
+        cfg.actuators["palm"].armature = {
+            r"root_[xyz]_axis_joint": 0.001,
+            r"root_[xyz]_rot_joint": 0.0005,
+        }
+    return cfg
 
 
 def author_dg5f_collision_filters(stage, root_path: str, *, floating: bool = False) -> int:
