@@ -70,14 +70,15 @@ def set_spring_preload(
     if names != [PLUNGER_JOINT]:
         raise ValueError(f"Expected one pipette plunger joint, found {names}")
     rows = slice(None) if env_ids is None else env_ids
-    positions = pipette.data.default_joint_pos[rows][:, joint_ids]
-    pipette.set_joint_position_target(
-        positions.new_full(positions.shape, SPRING_REST_TARGET_M),
+    positions = pipette.data.default_joint_pos.torch[rows][:, joint_ids]
+    command = pipette.actuators.target_command
+    command.set_position_index(
+        value=positions.new_full(positions.shape, SPRING_REST_TARGET_M),
         joint_ids=joint_ids,
         env_ids=env_ids,
     )
-    pipette.set_joint_velocity_target(
-        positions.new_zeros(positions.shape),
+    command.set_velocity_index(
+        value=positions.new_zeros(positions.shape),
         joint_ids=joint_ids,
         env_ids=env_ids,
     )
