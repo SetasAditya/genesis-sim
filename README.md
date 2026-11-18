@@ -8,10 +8,10 @@ training are not qualified.
 
 ![Wet-lab overview](assets/previews/overview.png)
 
-## Cabinet pipette task
+## Open-frame pipette task
 
-The cabinet task provides a spring-return Gilson pipette, cabinet shelf and
-test tube. Choose `--robot mounted` (DexMate + DG-5F, the default),
+The task provides an open shelving frame over a black-top workbench, a
+spring-return Gilson pipette, and a test tube. Choose `--robot mounted` (DexMate + DG-5F, the default),
 `--robot floating` (floating DG-5F), or `--robot vega` (handless DexMate for
 robot and scene inspection).
 
@@ -30,11 +30,18 @@ python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets
   --rgb outputs/cabinet.png --kit_args="--/renderer/multiGpu/enabled=false --/app/asyncRendering=false"
 ```
 
-**Reset and control.** By default, `--seed` controls placement sampling for
-cabinet XY and yaw and independent tube XY. The pipette moves with the cabinet
-shelf. The sampler screens fixture clearance and reach at two approach points.
-Use `--fixed-layout` for the nominal layout. Pass a custom layout and work
-surface to `cabinet_pipette_scene_cfg` for a different deployment, then use
+**Reset and control.** The frame and bench stay in place. By default the
+pipette varies in XY on the shelf and the tube varies independently in XY
+on the bench. The sampler screens shelf support, fixture clearance and
+wrist reach at the approach points. Use `--fixed-pipette` or `--fixed-tube`
+to disable either randomizer, or `--fixed-layout` to disable both. `--seed`
+sets the placement seed.
+
+The frame is 1.20 m wide by 0.36 m deep by 0.78 m high, with the shelf
+0.275 m above the bench top. The bench is 1.55 m wide by 0.86 m deep by
+0.865 m high. These are estimates. Change the dimensions, nominal poses
+and randomization ranges with `PipetteLayout`, `ShelfFrame` and `LabBench`.
+Pass the layout to `cabinet_pipette_scene_cfg` and use
 `reset_cabinet_pipette` for indexed resets. Control the robots through Isaac
 Lab's articulation commands or the action configs in `wetlab_isaaclab.robots.actions`.
 

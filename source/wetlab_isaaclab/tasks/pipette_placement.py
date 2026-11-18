@@ -14,9 +14,6 @@ from wetlab_isaaclab.robots.dexmate import ROBOT_CONTRACT, VEGA_1_URDF
 
 from .pipette_layout import PipetteLayout
 
-POSE_NAMES = ("cabinet", "pipette", "tube")
-
-
 def _xyz(value):
     return np.fromstring(value, sep=" ")
 
@@ -80,17 +77,11 @@ class _WristReach:
 
 
 @dataclass(frozen=True)
-class PlacementVariation:
-    cabinet_xy_m: tuple[float, float] = (0.07, 0.05)
-    cabinet_yaw_rad: float = 0.35
-    tube_xy_m: tuple[float, float] = (0.04, 0.04)
-
-
-@dataclass(frozen=True)
 class ScreenedPipetteLayouts:
     nominal: PipetteLayout
-    poses: torch.Tensor
-    attempted: int
+    pipette_poses: torch.Tensor
+    tube_poses: torch.Tensor
+    attempted: tuple[int, int]
 
     @property
     def cabinet(self):
@@ -104,9 +95,24 @@ class ScreenedPipetteLayouts:
     def pipette(self):
         return self.nominal.pipette
 
+    @property
+    def frame(self):
+        return self.nominal.frame
+
+    @property
+    def bench(self):
+        return self.nominal.bench
+
     def sample(self, count, *, device, generator=None):
-        indices = torch.randint(len(self.poses), (count,), device=device, generator=generator)
-        return dict(zip(POSE_NAMES, self.poses.to(device)[indices].unbind(dim=1), strict=True))
+        def draw(bank):
+            # Draw even for singleton banks to preserve the other object's stream.
+            indices = torch.randint(len(bank), (count,), device=device, generator=generator)
+            return bank.to(device)[indices]
+        return {
+            "cabinet": torch.tensor(self.cabinet, device=device).expand(count, -1),
+            "pipette": draw(self.pipette_poses),
+            "tube": draw(self.tube_poses),
+        }
 
 
 def screen_pipette_layouts(
@@ -115,19 +121,13 @@ def screen_pipette_layouts(
     base_position,
     base_rotation,
     floating: bool = False,
-    variation: PlacementVariation = PlacementVariation(),
     seed: int = 0,
     count: int = 32,
 ) -> ScreenedPipetteLayouts:
-    """Check fixture clearance and robot wrist reach at two approach waypoints.
+    """Independently sample shelf and bench placements with waypoint reach checks."""
 
-    This is a reset-time workspace screen. It checks two positions with
-    joint-limited IK for the mounted arm or translation bounds for the floating hand. It does not plan a collision-free trajectory.
-    """
     if count < 1:
         raise ValueError("count must be positive")
-    rng = np.random.default_rng(seed)
-    base = np.asarray([getattr(nominal, key) for key in POSE_NAMES])
     if floating:
         rotation = Rotation.from_quat((*base_rotation[1:], base_rotation[0]))
         stage_urdf = ASSET_ROOT / "robots/dexmate_dg5f/simulation.urdf"
@@ -142,38 +142,58 @@ def screen_pipette_layouts(
             return np.all((displacement >= bounds[0]) & (displacement <= bounds[1]))
     else:
         reaches = _WristReach(base_position, base_rotation).reaches
-    boxes = []
-    cabinet_urdf = ASSET_ROOT / "equipment/cabinet/cabinet.urdf"
-    for collision in ET.parse(cabinet_urdf).findall("link/collision"):
-        center = _xyz(collision.find("origin").get("xyz"))
-        radius = _xyz(collision.find("geometry/box").get("size")) / 2
-        boxes.append((center, radius))
-    layouts = []
-    for attempted in range(1, count * 8 + 1):
-        values = base.copy()
-        offsets = rng.uniform(-1, 1, size=5)
-        rotation = Rotation.from_rotvec((0, 0, offsets[2] * variation.cabinet_yaw_rad))
-        values[:2, :3] = base[0, :3] + rotation.apply(base[:2, :3] - base[0, :3])
-        values[:2, :2] += offsets[:2] * variation.cabinet_xy_m
-        values[:2, 3:] = (rotation * Rotation.from_quat(base[:2, (4, 5, 6, 3)])).as_quat()[:, (3, 0, 1, 2)]
-        values[2, :2] += offsets[3:] * variation.tube_xy_m
-        cabinet, pipette, tube = values
-        frame = Rotation.from_quat(cabinet[[4, 5, 6, 3]])
-        tube_approach = tube[:3] + (0, -0.08, 0.27)
-        cabinet_approach = pipette[:3] + frame.apply((0.13, 0, 0.035))
-        tube_column = tube[:3] + np.array([[0, 0, z] for z in (0.018, 0.06, 0.112)])
-        # The outer tube base has a 30 mm half-width. Use a 45 mm
-        # horizontal envelope to also bound its corners under relative yaw.
-        tested = np.vstack((tube_column, cabinet_approach, tube_approach))
-        pad = np.array([[.045, .045, .015]] * 3 + [[.025] * 3] * 2)
-        local = frame.inv().apply(tested - cabinet[:3])
-        if any(np.any(np.all(np.abs(local - center) < half + pad, axis=-1)) for center, half in boxes):
-            continue
-        if not all(reaches(point) for point in (cabinet_approach, tube_approach)):
-            continue
-        layouts.append(values)
-        if len(layouts) == count:
-            break
-    if not layouts:
-        raise ValueError("No placement passed the configured workspace screen")
-    return ScreenedPipetteLayouts(nominal, torch.tensor(np.asarray(layouts), dtype=torch.float32), attempted)
+    frame_pose = np.asarray(nominal.cabinet)
+    frame = Rotation.from_quat(frame_pose[[4, 5, 6, 3]])
+    boxes = [(np.asarray(center), np.asarray(size) / 2) for center, size in nominal.frame.boxes()]
+
+    def clear(points, pads):
+        local = frame.inv().apply(points - frame_pose[:3])
+        return not any(np.any(np.all(np.abs(local - center) < half + pads, axis=-1))
+                       for center, half in boxes)
+
+    def valid_pipette(pose):
+        center = frame.inv().apply(pose[:3] - frame_pose[:3])
+        # Conservative horizontal tool footprint in the shelf plane.
+        orientation = frame.inv() * Rotation.from_quat(pose[[4, 5, 6, 3]])
+        half = np.abs(orientation.as_matrix()) @ np.array((.04, .04, .15))
+        shelf_half = np.array((nominal.frame.width / 2 - nominal.frame.post_width, nominal.frame.depth / 2))
+        if np.any(np.abs(center[:2]) + half[:2] > shelf_half):
+            return False
+        approach = pose[:3] + frame.apply((0, -.13, .035))
+        return clear(approach[None, :], .025) and reaches(approach)
+
+    def valid_tube(pose):
+        bench_half = np.array((nominal.bench.width, nominal.bench.depth)) / 2
+        if np.any(np.abs(pose[:2] - nominal.bench.center_xy) + .045 > bench_half):
+            return False
+        approach = pose[:3] + (0, -.08, .27)
+        tube_column = pose[:3] + np.array([[0, 0, z] for z in (.018, .06, .112)])
+        tested = np.vstack((tube_column, approach))
+        pads = np.array([[.045, .045, .015]] * 3 + [[.025] * 3])
+        return clear(tested, pads) and reaches(approach)
+
+    def screen(pose, enabled, half_range, accept, rng, name):
+        if not (nominal.randomize and enabled):
+            return torch.tensor([pose], dtype=torch.float32), 0
+        bank = []
+        for attempted in range(1, count * 8 + 1):
+            candidate = np.array(pose)
+            candidate[:2] += rng.uniform(-1, 1, 2) * half_range
+            if accept(candidate):
+                bank.append(candidate)
+                if len(bank) == count:
+                    break
+        if not bank:
+            raise ValueError(f"No {name} placement passed the configured workspace screen")
+        return torch.tensor(np.asarray(bank), dtype=torch.float32), attempted
+
+    pipette_seed, tube_seed = np.random.SeedSequence(seed).spawn(2)
+    pipettes, pipette_attempts = screen(
+        nominal.pipette, nominal.randomize_pipette, nominal.pipette_xy_half_range_m,
+        valid_pipette, np.random.default_rng(pipette_seed), "pipette",
+    )
+    tubes, tube_attempts = screen(
+        nominal.tube, nominal.randomize_tube, nominal.tube_xy_half_range_m,
+        valid_tube, np.random.default_rng(tube_seed), "tube",
+    )
+    return ScreenedPipetteLayouts(nominal, pipettes, tubes, (pipette_attempts, tube_attempts))

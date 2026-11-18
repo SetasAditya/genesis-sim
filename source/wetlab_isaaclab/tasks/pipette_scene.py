@@ -9,17 +9,17 @@ def cabinet_pipette_scene_cfg(
     *,
     robot,
     pipette_usd: str | Path,
-    cabinet_usd: str | Path,
+    cabinet_usd: str | Path | None = None,
     tube_usd: str | Path,
-    work_surface,
+    work_surface=None,
     num_envs: int,
     env_spacing: float,
     layout: PipetteLayout = PipetteLayout(),
 ):
     """Compose a cloned scene from converted equipment and a deployment surface.
 
-    The cabinet and tube USDs each supply one rigid body with colliders. Their
-    kinematic roots allow the environment to reposition them on indexed resets.
+    The open frame and bench use configurable box geometry. A supplied fixture
+    USD or work surface can replace them for another deployment.
     """
     import isaaclab.sim as sim_utils
     from isaaclab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
@@ -29,13 +29,53 @@ def cabinet_pipette_scene_cfg(
 
     from wetlab_isaaclab.equipment.gilson_pipette import gilson_pipette_cfg
 
-    def fixture(name: str, usd: str | Path, pose: Pose):
-        return RigidObjectCfg(
-            prim_path=f"{{ENV_REGEX_NS}}/{name}",
-            spawn=sim_utils.UsdFileCfg(
+    from isaaclab.sim.utils.prims import clone, create_prim
+
+    @clone
+    def spawn_boxes(prim_path, cfg, translation=None, orientation=None):
+        root = create_prim(prim_path, "Xform", translation=translation, orientation=orientation)
+        for index, ((center, size), color) in enumerate(zip(cfg.boxes, cfg.colors, strict=True)):
+            box = sim_utils.CuboidCfg(
+                size=size, collision_props=sim_utils.CollisionPropertiesCfg(),
+                visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=color),
+            )
+            box.func(f"{prim_path}/Part{index}", box, translation=center)
+        if cfg.kinematic:
+            sim_utils.define_rigid_body_properties(
+                prim_path, sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
+            )
+        return root
+
+    @configclass
+    class BoxAssemblyCfg(sim_utils.SpawnerCfg):
+        func = spawn_boxes
+        boxes: tuple = ()
+        colors: tuple = ()
+        kinematic: bool = False
+
+    white = (0.84, 0.86, 0.87)
+    frame_boxes = tuple(layout.frame.boxes())
+    bench_boxes = tuple(layout.bench.boxes())
+    if work_surface is None:
+        work_surface = AssetBaseCfg(
+            prim_path="{ENV_REGEX_NS}/WorkSurface",
+            spawn=BoxAssemblyCfg(
+                boxes=bench_boxes, colors=((0.055, 0.06, 0.065),) + (white,) * (len(bench_boxes)-1),
+            ),
+            init_state=AssetBaseCfg.InitialStateCfg(pos=(*layout.bench.center_xy, 0.)),
+        )
+
+    def fixture(name: str, usd: str | Path | None, pose: Pose):
+        spawn = (
+            BoxAssemblyCfg(boxes=frame_boxes, colors=(white,) * len(frame_boxes), kinematic=True)
+            if usd is None else sim_utils.UsdFileCfg(
                 usd_path=str(Path(usd).expanduser().resolve(strict=True)),
                 rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
-            ),
+            )
+        )
+        return RigidObjectCfg(
+            prim_path=f"{{ENV_REGEX_NS}}/{name}",
+            spawn=spawn,
             init_state=RigidObjectCfg.InitialStateCfg(
                 pos=pose[:3], rot=(*pose[4:], pose[3]),
             ),
@@ -71,7 +111,7 @@ def cabinet_pipette_scene_cfg(
         pipette=gilson_pipette_cfg(
             pipette_usd, position=layout.pipette[:3], orientation=layout.pipette[3:],
         ),
-        cabinet=fixture("Cabinet", cabinet_usd, layout.cabinet),
+        cabinet=fixture("ShelfFrame" if cabinet_usd is None else "Cabinet", cabinet_usd, layout.cabinet),
         tube=fixture("Tube", tube_usd, layout.tube),
         press_contact=ContactSensorCfg(
             prim_path=plunger_path, filter_prim_paths_expr=hand_paths,
