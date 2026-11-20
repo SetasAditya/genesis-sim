@@ -45,8 +45,14 @@ try:
     if args.prepare:
         paths = prepare_pipette_assets(args.assets)
     else:
-        paths = {name: next((args.assets / name).glob("*/*.usda"))
-                 for name in (args.robot, "pipette", "tube")}
+        paths = {}
+        for name in (args.robot, "pipette", "tube"):
+            path = next((args.assets / name).glob("*/*.usda"), None)
+            if path is None:
+                raise FileNotFoundError(
+                    f"Missing converted {name} in {args.assets}. Use --prepare with a new cache directory."
+                )
+            paths[name] = path
 
     sim = SimulationContext(SimulationCfg(
         device=args.device, dt=0.01, physics=PhysxCfg(solver_type=1, bounce_threshold_velocity=2.0),
