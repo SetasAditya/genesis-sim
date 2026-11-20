@@ -10,13 +10,14 @@ class RailFrame:
     width: float = 1.20
     height: float = 1.00
     rail_top: float = 0.45
-    post_width: float = 0.030
+    post_width: float = 0.050
     tube_width: float = 0.100
     tube_height: float = 0.050
+    post_depth: float = 0.100
 
     @property
     def depth(self):
-        return max(self.post_width, self.tube_width)
+        return max(self.post_depth, self.tube_width)
 
     @property
     def edge_center(self):
@@ -29,7 +30,7 @@ class RailFrame:
         x = (self.width - post) / 2
         span = self.width - 2 * post
         for side_x in (-x, x):
-            yield (side_x, 0., self.height / 2), (post, post, self.height)
+            yield (side_x, 0., self.height / 2), (post, self.post_depth, self.height)
         for top in (self.height, self.rail_top):
             yield (0., 0., top - self.tube_height / 2), (
                 span, self.tube_width, self.tube_height,

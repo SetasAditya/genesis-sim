@@ -44,9 +44,15 @@ def test_default_frame_sits_at_the_back_edge_of_the_bench():
     layout = PipetteLayout(frame=RailFrame(rail_top=0.4))
     assert layout.frame.edge_center[2] == pytest.approx(0.4)
     assert (layout.frame.tube_width, layout.frame.tube_height) == (.100, .050)
+    uprights = list(layout.frame.boxes())[:2]
+    assert all(size == (.050, .100, layout.frame.height) for _, size in uprights)
     assert layout.cabinet[0] == layout.bench.center_xy[0]
     assert layout.cabinet[1] + layout.frame.depth / 2 == pytest.approx(
         layout.bench.center_xy[1] + layout.bench.depth / 2
+    )
+    deep_posts = PipetteLayout(frame=RailFrame(post_width=.035, post_depth=.120))
+    assert deep_posts.cabinet[1] + .120 / 2 == pytest.approx(
+        deep_posts.bench.center_xy[1] + deep_posts.bench.depth / 2
     )
     with pytest.raises(ValueError, match="requires an explicit pipette pose"):
         PipetteLayout(holder="frame-edge")

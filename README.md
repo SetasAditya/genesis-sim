@@ -37,10 +37,10 @@ wrist reach at the approach points. Use `--fixed-pipette` or `--fixed-tube`
 to disable either randomizer, or `--fixed-layout` to disable both. `--seed`
 sets the placement seed.
 
-The frame is a single plane along the back edge of the bench, 1.20 m wide and
-1.00 m high. Its horizontal members are 100 mm deep and 50 mm tall, with the
-lower member's top 0.45 m above the bench. The bench is 1.55 m
-wide by 0.86 m deep by 0.865 m high. These dimensions are configurable estimates.
+The frame sits along the back edge of the bench and measures 1.20 m wide by 1.00 m high. Its estimated rectangular section is 100 mm front to back and 50 mm across each upright or vertically across each rail. The lower rail's top is 0.45 m above the bench. The bench is 1.55 m wide by 0.86 m deep by 0.865 m high. These dimensions are configurable estimates.
+
+The rack crossbar and the lower frame rail both use static and dynamic friction coefficients of 1.5 with PhysX `max` combine. The rail coefficient is a modeling assumption. Physical friction against the lab frame has yet to be measured.
+
 The default holder is the reusable bench-mounted rack. Rack mode randomizes
 the rack and seated pipette together. The tube has its own independent
 placement range. Frame-edge mode requires an explicit nominal pose
