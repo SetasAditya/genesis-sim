@@ -57,9 +57,10 @@ to read robot state, poses, plunger travel and axial contact force. Call
 `task.reset(env_ids)` after resetting those worlds and `task.update()` once per
 control (20 Hz in the example). It returns `valid`, `fixture_stable`,
 `goal_reached`, `aligned`, `sustained_press`, and `success`.
-Success requires a valid state, stable fixture, goal and tube alignment, and a
-continuous one-second press hold with at least 15 mm travel and over 0.1 N
-axial force. The launcher's small joint command checks scene stepping. A caller
+At each control sample, success requires a valid state, a stable fixture, the
+coarse goal and a nozzle inside the tube alignment window. The one-second
+clock applies to retained pressing with at least 15 mm travel and over 0.1 N
+axial force. The task checks nozzle alignment at the scoring sample. The launcher's small joint command checks scene stepping. A caller
 supplies the manipulation controller.
 
 **Camera.** `--rgb` enables native Isaac RTX RGB and writes one 640×480 PNG per
