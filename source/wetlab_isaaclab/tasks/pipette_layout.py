@@ -12,6 +12,17 @@ from wetlab_isaaclab.equipment.rail_frame import LabBench, RailFrame
 Pose = tuple[float, float, float, float, float, float, float]
 
 
+def default_robot_base_pose(
+    *, robot: Literal["mounted", "floating", "vega"], holder: Literal["frame-edge", "rack"]
+) -> Pose:
+    """Bench-relative base pose in metres and wxyz for the two holder locations."""
+    if robot == "floating":
+        return (-.18, -.64, .32, 1., 0., 0., 0.)
+    # Turn the right shoulder toward the back rail from the same bench-side base.
+    orientation = (0., 0., 0., 1.) if holder == "frame-edge" else (.70710678, 0., 0., .70710678)
+    return (-.20, -.75, -.8647001386, *orientation)
+
+
 @dataclass(frozen=True)
 class PipetteLayout:
     """Poses in metres and wxyz. The frame is fixed across resets."""
@@ -48,19 +59,22 @@ class PipetteLayout:
             object.__setattr__(self, "tube", (x, -0.39385803, 0., 0.98822186, 0., 0., -0.15302796))
         if self.pipette is not None:
             return
-        if self.holder == "frame-edge":
-            raise ValueError("Frame-edge placement requires an explicit pipette pose")
-        pose = self.rack
-        w, x, y, z = pose[3:]
+        holder_pose = self.cabinet if self.holder == "frame-edge" else self.rack
+        w, x, y, z = holder_pose[3:]
         if x or y:
             raise ValueError("The holder must be upright or supplied with an explicit pipette pose")
-        # Seat the hook against the top-only crossbar in its local frame.
-        bx, by, bz = crossbar_rack_boxes()["crossbar"][0]
-        ox, oy, oz = bx - .01219919077, by - .00458220675, bz - .09343592834
-        qw, qx, qy, qz = .71850163639, -.13534433502, .10260591052, .67446967064
-        w, z = (w + z) * 2**-0.5, (z - w) * 2**-0.5
-        px, py, pz = pose[:3]
-        c, s = 1 - 2 * pose[6]**2, 2 * pose[3] * pose[6]
+        c, s = 1 - 2 * z * z, 2 * w * z
+        if self.holder == "frame-edge":
+            # Balance the finger hook over the lower rail at a slight lateral tilt.
+            ex, ey, ez = self.frame.edge_center
+            ox, oy, oz = ex, ey + .000640878747049, ez - .105510401581100
+            qw, qx, qy, qz = .565250980206578, .095548225237135, .098567850095761, -.813416403176771
+        else:
+            # Seat the hook against the top-only crossbar in its local frame.
+            bx, by, bz = crossbar_rack_boxes()["crossbar"][0]
+            ox, oy, oz = bx - .01432224037070, by - .00156960062965, bz - .09979704340709
+            qw, qx, qy, qz = .956332694386065, .046761838883144, .195681459931020, .212013854056333
+        px, py, pz = holder_pose[:3]
         object.__setattr__(self, "pipette", (
             px + c*ox - s*oy, py + s*ox + c*oy, pz + oz,
             w*qw - z*qz, w*qx - z*qy, w*qy + z*qx, w*qz + z*qw,

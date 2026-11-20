@@ -18,8 +18,7 @@ robot and scene inspection).
 Use Isaac Sim 6.1, Isaac Lab 3 and an NVIDIA GPU. Set up a new asset cache once
 with `--prepare`, then reuse it. The converter preserves the hand collision
 pieces, authors pair exclusions, and supplies positive inertias for the six
-floating-hand virtual links. Reconvert older caches to include the robot and
-pipette visual meshes.
+floating-hand virtual links. When upgrading an older cache, run `--prepare` in a new directory to include the current visual meshes and the pipette’s refined hanger collider.
 
 ```bash
 python -m pip install -e '.[cabinet]'
@@ -41,12 +40,12 @@ The frame sits along the back edge of the bench and measures 1.20 m wide by 1.00
 
 The rack crossbar and the lower frame rail both use static and dynamic friction coefficients of 1.5 with PhysX `max` combine. The rail coefficient is a modeling assumption. Physical friction against the lab frame has yet to be measured.
 
-The default holder is the reusable bench-mounted rack. Rack mode randomizes
-the rack and seated pipette together. The tube has its own independent
-placement range. Frame-edge mode requires an explicit nominal pose
-(`--holder frame-edge --pipette-pose X Y Z W QX QY QZ`). Change dimensions,
-nominal poses and randomization ranges with `PipetteLayout`, `RailFrame`
-and `LabBench`.
+The default holder is the bench-mounted rack. Rack mode moves the rack and seated pipette together. Use `--holder frame-edge` to release the pipette with its finger hook over the lower rail. The nominal release balances the hanger above the edge and the body against the rail face. Randomization translates that pose by up to ±100 mm along the rail. Both modes randomize the tube independently. Use `--pipette-pose X Y Z W QX QY QZ` to override the nominal pose, or configure dimensions and ranges with `PipetteLayout`, `RailFrame` and `LabBench`.
+
+For the frame-edge holder, the mounted robots turn 90° at the same base position to bring the rail and tube within right-wrist reach. Override the robot base position and orientation with `--robot-base-pose X Y Z W QX QY QZ` if your bench setup differs.
+
+The pipette has ten body colliders and one plunger collider. Three convex pieces describe the exposed finger hook. Hanging depends on release orientation. On the 100 × 50 mm rail, CPU PhysX retained 15 of 27 pre-tilted releases over 6.5 s. With the supplied frame-edge pose, GPU PhysX retained the pipette at the fixed location and all eight sampled positions (seed 41) for all 650 steps.
+
 Pass the layout to `cabinet_pipette_scene_cfg` and use
 `reset_cabinet_pipette` for indexed resets. Control the robots through Isaac
 Lab's articulation commands or the action configs in `wetlab_isaaclab.robots.actions`.

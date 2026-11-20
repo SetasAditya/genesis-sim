@@ -11,6 +11,8 @@ parser.add_argument("--robot", choices=("mounted", "floating", "vega"), default=
 parser.add_argument("--holder", choices=("frame-edge", "rack"), default="rack")
 parser.add_argument("--pipette-pose", nargs=7, type=float, metavar=("X", "Y", "Z", "W", "QX", "QY", "QZ"),
                     help="Set the nominal pipette pose in metres and wxyz")
+parser.add_argument("--robot-base-pose", nargs=7, type=float, metavar=("X", "Y", "Z", "W", "QX", "QY", "QZ"),
+                    help="Override the robot base pose relative to the bench-top frame")
 parser.add_argument("--num-envs", type=int, default=1)
 parser.add_argument("--fixed-layout", action="store_true", help="Disable both object randomizers")
 parser.add_argument("--fixed-pipette", action="store_true")
@@ -24,8 +26,6 @@ parser.add_argument("--rgb", type=Path, help="Save a native cabinet camera PNG")
 AppLauncher.add_app_launcher_args(parser)
 parser.add_argument("--headless", action="store_true")
 args = parser.parse_args()
-if args.holder == "frame-edge" and args.pipette_pose is None:
-    parser.error("--holder frame-edge requires --pipette-pose")
 launcher = AppLauncher(args, enable_cameras=args.rgb is not None)
 
 try:
@@ -37,7 +37,7 @@ try:
     from wetlab_isaaclab.equipment.prepare_pipette_assets import prepare_pipette_assets
     from wetlab_isaaclab.robots.dexmate import vega_1_robot_cfg
     from wetlab_isaaclab.robots.dg5f import dg5f_robot_cfg
-    from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
+    from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout, default_robot_base_pose
     from wetlab_isaaclab.tasks.pipette_placement import screen_pipette_layouts
     from wetlab_isaaclab.tasks.pipette_task import CabinetPipetteTask
     from wetlab_isaaclab.tasks.pipette_scene import cabinet_pipette_scene_cfg, reset_cabinet_pipette
@@ -57,9 +57,8 @@ try:
     sim = SimulationContext(SimulationCfg(
         device=args.device, dt=0.01, physics=PhysxCfg(solver_type=1, bounce_threshold_velocity=2.0),
     ))
-    pose = dict(position=(-0.20, -0.75, -0.8647001386), orientation=(0.70710678, 0.0, 0.0, 0.70710678))
-    if args.robot == "floating":
-        pose = dict(position=(-0.18, -0.64, 0.32))
+    base_pose = args.robot_base_pose or default_robot_base_pose(robot=args.robot, holder=args.holder)
+    pose = dict(position=base_pose[:3], orientation=base_pose[3:])
     configure = vega_1_robot_cfg if args.robot == "vega" else dg5f_robot_cfg
     if args.robot == "floating":
         pose["floating"] = True
