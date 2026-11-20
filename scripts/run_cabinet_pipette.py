@@ -174,6 +174,7 @@ try:
     print("CABINET_SCENE_STEP_PASS", flush=True)
 except Exception:
     traceback.print_exc()
+    launcher.app.close(exit_code=1)
     raise
-finally:
+else:
     launcher.app.close()
