@@ -156,10 +156,80 @@ def cabinet_pipette_scene_cfg(
     )
 
 
-def reset_cabinet_pipette(scene, env_ids, layout: PipetteLayout, *, generator=None):
-    """Reset selected worlds to the robot home and the sampled equipment poses."""
+class _SeatRelease:
+    """Break previous support contacts for one physics tick, then release the pipette at rest."""
+
+    def __init__(self, scene):
+        import weakref
+
+        import torch
+        from isaaclab_physx.physics.physx_manager import IsaacEvents
+
+        self.pipette = scene["pipette"]
+        self.pending = None
+        self.seats = torch.empty_like(self.pipette.data.root_link_pose_w.torch)
+        self.release = None
+        manager = scene.sim.physics_manager
+        for fn, event in ((self.before_step, IsaacEvents.PRE_PHYSICS_STEP),
+                          (self.after_step, IsaacEvents.POST_PHYSICS_STEP)):
+            handle = manager.register_callback(fn, event)
+            weakref.finalize(self, handle.deregister)
+
+    def queue(self, env_ids, settle):
+        import torch
+
+        ids = torch.as_tensor(env_ids, device=self.seats.device, dtype=torch.long)
+        if settle:
+            self.seats[ids] = self.pipette.data.root_link_pose_w.torch[ids]
+            self.pending = ids.clone() if self.pending is None else torch.cat((self.pending, ids)).unique()
+        elif self.pending is not None:
+            remaining = self.pending[~torch.isin(self.pending, ids)]
+            self.pending = remaining if remaining.numel() else None
+
+    def before_step(self, dt):
+        if self.pending is None:
+            return
+        ids, self.pending = self.pending, None
+        data = self.pipette.data
+        pose = data.root_link_pose_w.torch[ids]
+        # Explicit state writes by the caller after reset take precedence.
+        at_seat = (pose - self.seats[ids]).abs().amax(dim=1) < 1e-6
+        at_seat &= (data.root_link_vel_w.torch[ids] == 0).all(dim=1)
+        at_seat &= (data.joint_pos.torch[ids] == data.default_joint_pos.torch[ids]).all(dim=1)
+        at_seat &= (data.joint_vel.torch[ids] == 0).all(dim=1)
+        ids, seat = ids[at_seat], pose[at_seat]
+        if ids.numel():
+            # Park above the apparatus only between the native pre/post-step events.
+            # Reset observations and the first completed step both expose the seat.
+            clear = seat.clone()
+            clear[:, 2] += 2.0
+            self.pipette.write_root_pose_to_sim_index(root_pose=clear, env_ids=ids)
+            self.release = ids, seat
+
+    def after_step(self, dt):
+        if self.release is None:
+            return
+        ids, pose = self.release
+        self.release = None
+        pipe = self.pipette
+        pipe.write_root_pose_to_sim_index(root_pose=pose, env_ids=ids)
+        pipe.write_root_velocity_to_sim_index(root_velocity=pipe.data.default_root_vel.torch[ids], env_ids=ids)
+        pipe.write_joint_state_to_sim_index(
+            position=pipe.data.default_joint_pos.torch[ids], velocity=pipe.data.default_joint_vel.torch[ids],
+            env_ids=ids,
+        )
+
+
+def reset_cabinet_pipette(scene, env_ids, layout: PipetteLayout, *, generator=None, settle_seat=True):
+    """Reset selected worlds immediately, then release their seated pipettes on the next physics tick.
+
+    Pass settle_seat=False for a free start where a controller should act on the pipette
+    during that first tick. Post-reset pose, velocity or joint overrides supersede the hold.
+    """
     from wetlab_isaaclab.equipment.gilson_pipette import set_spring_preload
 
+    if len(env_ids) == 0:
+        return
     poses = layout.sample(len(env_ids), device=scene.device, generator=generator)
     relative_poses = {
         name: pose[:, (0, 1, 2, 4, 5, 6, 3)] for name, pose in poses.items()
@@ -190,3 +260,9 @@ def reset_cabinet_pipette(scene, env_ids, layout: PipetteLayout, *, generator=No
     scene.reset_to(state, env_ids=env_ids, is_relative=True)
     set_spring_preload(scene["pipette"], env_ids)
     scene.write_data_to_sim()
+
+    release = getattr(scene, "_pipette_seat_release", None)
+    if release is None and settle_seat and not scene["pipette"].is_fixed_base:
+        release = scene._pipette_seat_release = _SeatRelease(scene)
+    if release is not None:
+        release.queue(env_ids, settle_seat)

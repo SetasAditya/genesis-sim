@@ -50,6 +50,15 @@ Pass the layout to `cabinet_pipette_scene_cfg` and use
 `reset_cabinet_pipette` for indexed resets. Control the robots through Isaac
 Lab's articulation commands or the action configs in `wetlab_isaaclab.robots.actions`.
 
+An indexed reset returns the sampled seat immediately. During the next ordinary physics tick, only the reset pipettes are parked 2 m above their seats to clear previous holder contacts. At the end of that tick they return to the sampled poses at rest, with the spring preload active. All robots continue taking commands, and reset itself advances the simulation clock by zero steps. The supplied scene leaves this parking space clear. For a custom free start, an occupied overhead space, or immediate pipette actuation, pass `settle_seat=False`. Explicit pipette pose, velocity or joint-state changes made after reset take precedence.
+
+To check repeated randomized resets on GPU PhysX, run the native test once per holder with the converted asset directory. Each run relocates eight seated pipettes three times and leaves two moving robots in their original episodes.
+
+```bash
+python tests/native/check_indexed_pipette_reset.py --assets outputs/cabinet_assets --holder rack
+python tests/native/check_indexed_pipette_reset.py --assets outputs/cabinet_assets --holder frame-edge
+```
+
 **Observations and events.** The launcher prints `event_outcomes`, with one
 Boolean per world for each event. From Python, use `CabinetPipetteTask.observe()`
 to read robot state, poses, plunger travel and axial contact force. Call
