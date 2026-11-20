@@ -27,6 +27,7 @@ def cabinet_pipette_scene_cfg(
     from isaaclab.sensors import ContactSensorCfg
     from isaaclab.utils import configclass
 
+    from wetlab_isaaclab.equipment.crossbar_rack import crossbar_rack_boxes
     from wetlab_isaaclab.equipment.gilson_pipette import gilson_pipette_cfg
 
     from isaaclab.sim.utils.prims import clone, create_prim
@@ -35,8 +36,14 @@ def cabinet_pipette_scene_cfg(
     def spawn_boxes(prim_path, cfg, translation=None, orientation=None):
         root = create_prim(prim_path, "Xform", translation=translation, orientation=orientation)
         for index, ((center, size), color) in enumerate(zip(cfg.boxes, cfg.colors, strict=True)):
+            physical_material = None
+            if index == cfg.support_index:
+                physical_material = sim_utils.RigidBodyMaterialCfg(
+                    static_friction=1.5, dynamic_friction=1.5, friction_combine_mode="max",
+                )
             box = sim_utils.CuboidCfg(
                 size=size, collision_props=sim_utils.CollisionPropertiesCfg(),
+                physics_material=physical_material,
                 visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=color),
             )
             box.func(f"{prim_path}/Part{index}", box, translation=center)
@@ -52,6 +59,7 @@ def cabinet_pipette_scene_cfg(
         boxes: tuple = ()
         colors: tuple = ()
         kinematic: bool = False
+        support_index: int = -1
 
     white = (0.84, 0.86, 0.87)
     frame_boxes = tuple(layout.frame.boxes())
@@ -65,14 +73,17 @@ def cabinet_pipette_scene_cfg(
             init_state=AssetBaseCfg.InitialStateCfg(pos=(*layout.bench.center_xy, 0.)),
         )
 
-    def fixture(name: str, usd: str | Path | None, pose: Pose):
-        spawn = (
-            BoxAssemblyCfg(boxes=frame_boxes, colors=(white,) * len(frame_boxes), kinematic=True)
-            if usd is None else sim_utils.UsdFileCfg(
+    def boxes_asset(boxes, color, support_index):
+        return BoxAssemblyCfg(
+            boxes=boxes, colors=(color,) * len(boxes), kinematic=True, support_index=support_index,
+        )
+
+    def fixture(name: str, pose: Pose, *, usd=None, spawn=None):
+        if spawn is None:
+            spawn = sim_utils.UsdFileCfg(
                 usd_path=str(Path(usd).expanduser().resolve(strict=True)),
                 rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
             )
-        )
         return RigidObjectCfg(
             prim_path=f"{{ENV_REGEX_NS}}/{name}",
             spawn=spawn,
@@ -80,6 +91,15 @@ def cabinet_pipette_scene_cfg(
                 pos=pose[:3], rot=(*pose[4:], pose[3]),
             ),
         )
+
+    frame = (fixture("RailFrame", layout.cabinet, spawn=boxes_asset(frame_boxes, white, len(frame_boxes) - 1))
+             if cabinet_usd is None else fixture("Cabinet", layout.cabinet, usd=cabinet_usd))
+    rack = None
+    if layout.holder == "rack":
+        rack_boxes = crossbar_rack_boxes()
+        rack = fixture("Rack", layout.rack, spawn=boxes_asset(
+            tuple(rack_boxes.values()), (.20, .33, .55), tuple(rack_boxes).index("crossbar"),
+        ))
 
     def body_paths(usd, instance, accepts):
         from pxr import Usd, UsdPhysics
@@ -93,7 +113,10 @@ def cabinet_pipette_scene_cfg(
             if accepts(prim.GetName()) and prim.HasAPI(UsdPhysics.RigidBodyAPI)
         ]
 
-    hand_paths = body_paths(robot.spawn.usd_path, "Robot", lambda name: name.startswith("rl_dg_"))
+    hand_paths = (
+        body_paths(robot.spawn.usd_path, "Robot", lambda name: name.startswith("rl_dg_"))
+        if robot is not None else []
+    )
     plunger_path, = body_paths(pipette_usd, "Pipette", lambda name: name == "pipette_plunger")
 
     @configclass
@@ -103,16 +126,27 @@ def cabinet_pipette_scene_cfg(
         pipette: ArticulationCfg | None = None
         cabinet: RigidObjectCfg | None = None
         tube: RigidObjectCfg | None = None
+        rack: RigidObjectCfg | None = None
         press_contact: ContactSensorCfg | None = None
+
+    pipette = gilson_pipette_cfg(
+        pipette_usd, position=layout.pipette[:3], orientation=layout.pipette[3:],
+    )
+    if cabinet_usd is None:
+        from isaaclab_physx.sim.schemas.schemas_cfg import PhysxRigidBodyPropertiesCfg
+
+        # Bound the depenetration impulse when a narrow edge seats in the hook.
+        pipette.spawn.rigid_props = PhysxRigidBodyPropertiesCfg(
+            disable_gravity=False, max_depenetration_velocity=0.5,
+        )
 
     return CabinetPipetteSceneCfg(
         robot=robot,
         work_surface=work_surface,
-        pipette=gilson_pipette_cfg(
-            pipette_usd, position=layout.pipette[:3], orientation=layout.pipette[3:],
-        ),
-        cabinet=fixture("ShelfFrame" if cabinet_usd is None else "Cabinet", cabinet_usd, layout.cabinet),
-        tube=fixture("Tube", tube_usd, layout.tube),
+        pipette=pipette,
+        cabinet=frame,
+        tube=fixture("Tube", layout.tube, usd=tube_usd),
+        rack=rack,
         press_contact=ContactSensorCfg(
             prim_path=plunger_path, filter_prim_paths_expr=hand_paths,
             track_friction_forces=True, max_contact_data_count_per_prim=256,

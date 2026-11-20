@@ -10,6 +10,7 @@ from scipy.spatial.transform import Rotation
 import torch
 
 from wetlab_isaaclab.assets import ASSET_ROOT
+from wetlab_isaaclab.equipment.crossbar_rack import crossbar_rack_boxes
 from wetlab_isaaclab.robots.dexmate import ROBOT_CONTRACT, VEGA_1_URDF
 
 from .pipette_layout import PipetteLayout
@@ -96,6 +97,14 @@ class ScreenedPipetteLayouts:
         return self.nominal.pipette
 
     @property
+    def holder(self):
+        return self.nominal.holder
+
+    @property
+    def rack(self):
+        return self.nominal.rack
+
+    @property
     def frame(self):
         return self.nominal.frame
 
@@ -108,11 +117,14 @@ class ScreenedPipetteLayouts:
             # Draw even for singleton banks to preserve the other object's stream.
             indices = torch.randint(len(bank), (count,), device=device, generator=generator)
             return bank.to(device)[indices]
-        return {
+        result = {
             "cabinet": torch.tensor(self.cabinet, device=device).expand(count, -1),
             "pipette": draw(self.pipette_poses),
             "tube": draw(self.tube_poses),
         }
+        if self.holder == "rack":
+            result["rack"] = self.nominal.rack_for_pipette(result["pipette"])
+        return result
 
 
 def screen_pipette_layouts(
@@ -124,7 +136,7 @@ def screen_pipette_layouts(
     seed: int = 0,
     count: int = 32,
 ) -> ScreenedPipetteLayouts:
-    """Independently sample shelf and bench placements with waypoint reach checks."""
+    """Independently sample bar and bench placements with waypoint reach checks."""
 
     if count < 1:
         raise ValueError("count must be positive")
@@ -151,34 +163,52 @@ def screen_pipette_layouts(
         return not any(np.any(np.all(np.abs(local - center) < half + pads, axis=-1))
                        for center, half in boxes)
 
+    bench_lo = np.asarray(nominal.bench.center_xy) - np.array((nominal.bench.width, nominal.bench.depth)) / 2
+    bench_hi = 2 * np.asarray(nominal.bench.center_xy) - bench_lo
+    if nominal.holder == "rack":
+        rack = np.asarray(nominal.rack)
+        rack_rotation = Rotation.from_quat(rack[[4, 5, 6, 3]])
+        rack_boxes = [
+            (rack_rotation.apply(center) + rack[:3], abs(rack_rotation.as_matrix()) @ (np.asarray(size) / 2))
+            for center, size in crossbar_rack_boxes().values()
+        ]
+        rack_lo = np.min([center[:2] - half[:2] for center, half in rack_boxes], axis=0)
+        rack_hi = np.max([center[:2] + half[:2] for center, half in rack_boxes], axis=0)
+        rack_range = np.array(nominal.rack_xy_half_range_m if nominal.randomize_pipette else (0., 0.))
+
     def valid_pipette(pose):
-        center = frame.inv().apply(pose[:3] - frame_pose[:3])
-        # Conservative horizontal tool footprint in the shelf plane.
-        orientation = frame.inv() * Rotation.from_quat(pose[[4, 5, 6, 3]])
-        half = np.abs(orientation.as_matrix()) @ np.array((.04, .04, .15))
-        shelf_half = np.array((nominal.frame.width / 2 - nominal.frame.post_width, nominal.frame.depth / 2))
-        if np.any(np.abs(center[:2]) + half[:2] > shelf_half):
-            return False
-        approach = pose[:3] + frame.apply((0, -.13, .035))
+        if nominal.holder == "rack":
+            shift = pose[:2] - nominal.pipette[:2]
+            if np.any(rack_lo + shift < bench_lo) or np.any(rack_hi + shift > bench_hi):
+                return False
+            approach = pose[:3] + (0, -.09, .04)
+        else:
+            center = frame.inv().apply(pose[:3] - frame_pose[:3])
+            if abs(center[0]) + .035 > nominal.frame.width / 2 - nominal.frame.post_width:
+                return False
+            approach = pose[:3] + frame.apply((0, -.13, .035))
         return clear(approach[None, :], .025) and reaches(approach)
 
     def valid_tube(pose):
-        bench_half = np.array((nominal.bench.width, nominal.bench.depth)) / 2
-        if np.any(np.abs(pose[:2] - nominal.bench.center_xy) + .045 > bench_half):
+        if np.any(pose[:2] - .045 < bench_lo) or np.any(pose[:2] + .045 > bench_hi):
             return False
+        if nominal.holder == "rack":
+            if np.all((pose[:2] + .045 > rack_lo - rack_range) &
+                      (pose[:2] - .045 < rack_hi + rack_range)):
+                return False
         approach = pose[:3] + (0, -.08, .27)
         tube_column = pose[:3] + np.array([[0, 0, z] for z in (.018, .06, .112)])
         tested = np.vstack((tube_column, approach))
         pads = np.array([[.045, .045, .015]] * 3 + [[.025] * 3])
         return clear(tested, pads) and reaches(approach)
 
-    def screen(pose, enabled, half_range, accept, rng, name):
+    def screen(pose, enabled, perturb, accept, rng, name):
         if not (nominal.randomize and enabled):
             return torch.tensor([pose], dtype=torch.float32), 0
         bank = []
         for attempted in range(1, count * 8 + 1):
             candidate = np.array(pose)
-            candidate[:2] += rng.uniform(-1, 1, 2) * half_range
+            candidate[:2] += perturb(rng)
             if accept(candidate):
                 bank.append(candidate)
                 if len(bank) == count:
@@ -187,13 +217,20 @@ def screen_pipette_layouts(
             raise ValueError(f"No {name} placement passed the configured workspace screen")
         return torch.tensor(np.asarray(bank), dtype=torch.float32), attempted
 
+    def perturb_holder(rng):
+        if nominal.holder == "rack":
+            return rng.uniform(-1, 1, 2) * nominal.rack_xy_half_range_m
+        return rng.uniform(-1, 1) * nominal.pipette_slide_half_range_m * np.array(nominal.rail_axis_xy)
+
     pipette_seed, tube_seed = np.random.SeedSequence(seed).spawn(2)
     pipettes, pipette_attempts = screen(
-        nominal.pipette, nominal.randomize_pipette, nominal.pipette_xy_half_range_m,
+        nominal.pipette, nominal.randomize_pipette,
+        perturb_holder,
         valid_pipette, np.random.default_rng(pipette_seed), "pipette",
     )
     tubes, tube_attempts = screen(
-        nominal.tube, nominal.randomize_tube, nominal.tube_xy_half_range_m,
+        nominal.tube, nominal.randomize_tube,
+        lambda rng: rng.uniform(-1, 1, 2) * nominal.tube_xy_half_range_m,
         valid_tube, np.random.default_rng(tube_seed), "tube",
     )
     return ScreenedPipetteLayouts(nominal, pipettes, tubes, (pipette_attempts, tube_attempts))

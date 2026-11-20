@@ -1,35 +1,39 @@
-"""Configurable open shelf and lab bench, with dimensions in metres."""
+"""Configurable rail frame and lab bench, with dimensions in metres."""
 
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class ShelfFrame:
-    """The frame origin is at the center of its footprint on the bench top."""
+class RailFrame:
+    """One upright frame, with both uprights and rails in a single plane."""
 
     width: float = 1.20
-    depth: float = 0.36
     height: float = 1.00
-    shelf_top: float = 0.45
-    shelf_thickness: float = 0.024
-    post_width: float = 0.027
+    rail_top: float = 0.45
+    post_width: float = 0.030
+    tube_width: float = 0.100
+    tube_height: float = 0.050
+
+    @property
+    def depth(self):
+        return max(self.post_width, self.tube_width)
+
+    @property
+    def edge_center(self):
+        """The front top edge of the lower member."""
+        return (0., -self.tube_width / 2, self.rail_top)
 
     def boxes(self):
-        """Local centers and sizes for both the collision and visual geometry."""
+        """Configurable rectangular members in local frame coordinates."""
         post = self.post_width
         x = (self.width - post) / 2
-        y = (self.depth - post) / 2
+        span = self.width - 2 * post
         for side_x in (-x, x):
-            for side_y in (-y, y):
-                yield (side_x, side_y, self.height / 2), (post, post, self.height)
-        yield (0., 0., self.shelf_top - self.shelf_thickness / 2), (
-            self.width - 2 * post, self.depth, self.shelf_thickness,
-        )
-        top = self.height - post / 2
-        for side_y in (-y, y):
-            yield (0., side_y, top), (self.width - 2 * post, post, post)
-        for side_x in (-x, x):
-            yield (side_x, 0., top), (post, self.depth - 2 * post, post)
+            yield (side_x, 0., self.height / 2), (post, post, self.height)
+        for top in (self.height, self.rail_top):
+            yield (0., 0., top - self.tube_height / 2), (
+                span, self.tube_width, self.tube_height,
+            )
 
 
 @dataclass(frozen=True)

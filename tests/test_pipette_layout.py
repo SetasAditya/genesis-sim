@@ -1,4 +1,4 @@
-"""The deployment shelves stay fixed and each movable object has its own switch."""
+"""The deployment rails stay fixed and each movable object has its own switch."""
 
 from dataclasses import replace
 
@@ -35,11 +35,65 @@ def test_placement_toggles_preserve_independent_draws():
             torch.testing.assert_close(poses, torch.tensor(getattr(nominal, name)).expand(16, -1))
 
 
-def test_default_pipette_pose_follows_shelf_height():
+def test_default_frame_sits_at_the_back_edge_of_the_bench():
     pytest.importorskip("torch")
 
-    from wetlab_isaaclab.equipment.shelf_frame import ShelfFrame
+    from wetlab_isaaclab.equipment.rail_frame import RailFrame
     from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
 
-    layout = PipetteLayout(frame=ShelfFrame(shelf_top=0.4))
-    assert layout.pipette[2] == pytest.approx(0.421335)
+    layout = PipetteLayout(frame=RailFrame(rail_top=0.4))
+    assert layout.frame.edge_center[2] == pytest.approx(0.4)
+    assert (layout.frame.tube_width, layout.frame.tube_height) == (.100, .050)
+    assert layout.cabinet[0] == layout.bench.center_xy[0]
+    assert layout.cabinet[1] + layout.frame.depth / 2 == pytest.approx(
+        layout.bench.center_xy[1] + layout.bench.depth / 2
+    )
+    with pytest.raises(ValueError, match="requires an explicit pipette pose"):
+        PipetteLayout(holder="frame-edge")
+
+
+
+def test_pipette_moves_only_along_the_rail():
+    torch = pytest.importorskip("torch")
+
+    from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
+
+    # A 90-degree yaw puts the long dimension of the frame along world Y.
+    half_turn = 2**-0.5
+    layout = PipetteLayout(
+        holder="frame-edge", cabinet=(.10, -.18, 0., half_turn, 0., 0., half_turn),
+        pipette=(.14, -.18, .36, 1., 0., 0., 0.),
+    )
+    pipette = layout.sample(16, device="cpu", generator=torch.Generator().manual_seed(41))["pipette"]
+    torch.testing.assert_close(pipette[:, 0], torch.full((16,), layout.pipette[0]))
+    assert torch.unique(pipette[:, 1]).numel() > 1
+    assert all(size[1] < .15 for _, size in layout.frame.boxes())
+    posts = [(center, size) for center, size in layout.frame.boxes() if size[2] == layout.frame.height]
+    assert len(posts) == 2
+    assert all(center[1] == 0 for center, _ in layout.frame.boxes())
+
+
+def test_rack_moves_with_pipette_and_tube_stays_independent():
+    torch = pytest.importorskip("torch")
+
+    from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
+    from wetlab_isaaclab.tasks.pipette_placement import screen_pipette_layouts
+
+    nominal = PipetteLayout(holder="rack")
+
+    def sample(layout, screened):
+        if screened:
+            layout = screen_pipette_layouts(
+                layout, base_position=(-.18, -.64, .32), base_rotation=(1., 0., 0., 0.),
+                floating=True,
+            )
+        return layout.sample(16, device="cpu", generator=torch.Generator().manual_seed(12))
+
+    for screened in (False, True):
+        result = sample(nominal, screened)
+        fixed = sample(replace(nominal, randomize_pipette=False), screened)
+        offset = torch.tensor(nominal.pipette[:3]) - torch.tensor(nominal.rack[:3])
+        torch.testing.assert_close(result["pipette"][:, :3] - result["rack"][:, :3], offset.expand(16, -1))
+        torch.testing.assert_close(result["tube"], fixed["tube"])
+        torch.testing.assert_close(fixed["rack"], torch.tensor(nominal.rack).expand(16, -1))
+        assert torch.unique(result["rack"], dim=0).shape[0] > 1

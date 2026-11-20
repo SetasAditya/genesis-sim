@@ -8,6 +8,9 @@ from isaaclab.app import AppLauncher
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--robot", choices=("mounted", "floating", "vega"), default="mounted")
+parser.add_argument("--holder", choices=("frame-edge", "rack"), default="rack")
+parser.add_argument("--pipette-pose", nargs=7, type=float, metavar=("X", "Y", "Z", "W", "QX", "QY", "QZ"),
+                    help="Set the nominal pipette pose in metres and wxyz")
 parser.add_argument("--num-envs", type=int, default=1)
 parser.add_argument("--fixed-layout", action="store_true", help="Disable both object randomizers")
 parser.add_argument("--fixed-pipette", action="store_true")
@@ -21,6 +24,8 @@ parser.add_argument("--rgb", type=Path, help="Save a native cabinet camera PNG")
 AppLauncher.add_app_launcher_args(parser)
 parser.add_argument("--headless", action="store_true")
 args = parser.parse_args()
+if args.holder == "frame-edge" and args.pipette_pose is None:
+    parser.error("--holder frame-edge requires --pipette-pose")
 launcher = AppLauncher(args, enable_cameras=args.rgb is not None)
 
 try:
@@ -54,6 +59,8 @@ try:
         pose["floating"] = True
     robot = configure(paths[args.robot], **pose)
     layout = PipetteLayout(
+        holder=args.holder,
+        pipette=tuple(args.pipette_pose) if args.pipette_pose is not None else None,
         randomize=not args.fixed_layout,
         randomize_pipette=not args.fixed_pipette, randomize_tube=not args.fixed_tube,
     )
@@ -89,7 +96,7 @@ try:
                 size=(2.60, .02, 2.1),
                 visual_material=PreviewSurfaceCfg(diffuse_color=(.29, .20, .17)),
             ),
-            init_state=AssetBaseCfg.InitialStateCfg(pos=(.1, .30, .14)),
+            init_state=AssetBaseCfg.InitialStateCfg(pos=(.1, .37, .14)),
         )
     scene = InteractiveScene(scene_cfg)
     sim.reset()
@@ -158,7 +165,7 @@ try:
     if args.num_envs > 1:
         frame_before = scene["cabinet"].data.root_link_pose_w.torch.clone()
         object_before = {name: scene[name].data.root_link_pose_w.torch[1:].clone()
-                         for name in ("pipette", "tube")}
+                         for name in ("pipette", "tube", "rack") if name in scene.rigid_objects or name == "pipette"}
         reset_cabinet_pipette(scene, ids[:1], layout, generator=rng)
         task.reset(ids[:1])
         torch.testing.assert_close(scene["cabinet"].data.root_link_pose_w.torch, frame_before)

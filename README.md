@@ -10,7 +10,7 @@ training are not qualified.
 
 ## Open-frame pipette task
 
-The task provides an open shelving frame over a black-top workbench, a
+The task provides an open rail frame over a black-top workbench, a
 spring-return Gilson pipette, and a test tube. Choose `--robot mounted` (DexMate + DG-5F, the default),
 `--robot floating` (floating DG-5F), or `--robot vega` (handless DexMate for
 robot and scene inspection).
@@ -31,16 +31,22 @@ python scripts/run_cabinet_pipette.py --headless --assets outputs/cabinet_assets
 ```
 
 **Reset and control.** The frame and bench stay in place. By default the
-pipette varies in XY on the shelf and the tube varies independently in XY
-on the bench. The sampler screens shelf support, fixture clearance and
+pipette varies along the selected frame edge or with its rack and the tube varies independently in XY
+on the bench. The sampler screens bar span, fixture clearance and
 wrist reach at the approach points. Use `--fixed-pipette` or `--fixed-tube`
 to disable either randomizer, or `--fixed-layout` to disable both. `--seed`
 sets the placement seed.
 
-The frame is 1.20 m wide by 0.36 m deep by 1.00 m high, with the shelf
-0.45 m above the bench top. The bench is 1.55 m wide by 0.86 m deep by
-0.865 m high. These are estimates. Change the dimensions, nominal poses
-and randomization ranges with `PipetteLayout`, `ShelfFrame` and `LabBench`.
+The frame is a single plane along the back edge of the bench, 1.20 m wide and
+1.00 m high. Its horizontal members are 100 mm deep and 50 mm tall, with the
+lower member's top 0.45 m above the bench. The bench is 1.55 m
+wide by 0.86 m deep by 0.865 m high. These dimensions are configurable estimates.
+The default holder is the reusable bench-mounted rack. Rack mode randomizes
+the rack and seated pipette together. The tube has its own independent
+placement range. Frame-edge mode requires an explicit nominal pose
+(`--holder frame-edge --pipette-pose X Y Z W QX QY QZ`). Change dimensions,
+nominal poses and randomization ranges with `PipetteLayout`, `RailFrame`
+and `LabBench`.
 Pass the layout to `cabinet_pipette_scene_cfg` and use
 `reset_cabinet_pipette` for indexed resets. Control the robots through Isaac
 Lab's articulation commands or the action configs in `wetlab_isaaclab.robots.actions`.
