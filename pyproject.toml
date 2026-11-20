@@ -10,7 +10,7 @@ requires-python = ">=3.11"
 dependencies = ["numpy", "opencv-python", "scipy>=1.11"]
 
 [project.optional-dependencies]
-cabinet = ["trimesh>=4.2"]
+cabinet = ["trimesh>=4.2", "gymnasium"]
 
 [tool.setuptools.packages.find]
 where = ["source"]

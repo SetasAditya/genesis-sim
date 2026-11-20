@@ -220,9 +220,10 @@ class _SeatRelease:
         )
 
 
-def reset_cabinet_pipette(scene, env_ids, layout: PipetteLayout, *, generator=None, settle_seat=True):
+def reset_cabinet_pipette(scene, env_ids, layout: PipetteLayout, *, generator=None, settle_seat=True, poses=None):
     """Reset selected worlds immediately, then release their seated pipettes on the next physics tick.
 
+    An optional poses mapping supplies the layout sample for the selected worlds.
     Pass settle_seat=False for a free start where a controller should act on the pipette
     during that first tick. Post-reset pose, velocity or joint overrides supersede the hold.
     """
@@ -230,7 +231,8 @@ def reset_cabinet_pipette(scene, env_ids, layout: PipetteLayout, *, generator=No
 
     if len(env_ids) == 0:
         return
-    poses = layout.sample(len(env_ids), device=scene.device, generator=generator)
+    if poses is None:
+        poses = layout.sample(len(env_ids), device=scene.device, generator=generator)
     relative_poses = {
         name: pose[:, (0, 1, 2, 4, 5, 6, 3)] for name, pose in poses.items()
     }

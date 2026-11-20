@@ -83,6 +83,66 @@ textures.
 python tests/native/check_floating_press.py --assets outputs/cabinet_assets
 ```
 
+### Registered rack environments
+
+Use Isaac Sim **6.1.0.0** and Isaac Lab **3.0.0rc1**, with the converted asset
+cache from the command above. After starting Isaac Lab's `AppLauncher`, import
+`wetlab_isaaclab.tasks` to register the environments.
+
+```python
+import gymnasium as gym
+import wetlab_isaaclab.tasks
+
+env = gym.make("Wetlab-Pipette-Rack-Mounted-v0",
+               assets="outputs/cabinet_assets", num_envs=8)
+obs, info = env.reset(seed=41)
+home = obs["policy"][:, env.observation_slices["robot_joint_pos"]].clone()
+obs, reward, terminated, truncated, info = env.step(home)
+env.close()
+```
+
+Use `Wetlab-Pipette-Rack-Floating-v0` for the floating DG-5F. Actions are batched
+absolute joint positions in `env.joint_names` order, in radians or metres.
+`env.observation_slices` maps names to columns in the privileged state tensor.
+Object positions are relative to each bench's environment origin, orientations
+are XYZW, velocities use SI units and axial force is in newtons.
+
+Each control advances five 10 ms physics steps. A native validity failure or
+the shared success event terminates an episode. The 500-step time limit
+truncates it. Success yields a reward of 1. Done rows use Isaac Lab same-step
+autoreset. Read terminal observations in `info["final_obs"]["policy"]` for
+those rows and per-control outcome flags in `info["events"]`.
+
+For explicit placement batches, pass `reset(options={"layouts": rows})`, with
+one record per world and fields `rack` and `tube` containing bench-relative
+`[x, y, z, w, qx, qy, qz]` poses. The pipette starts in the supplied rack seat
+and the robot starts at home. The generic evaluator reads these records from
+JSON. An optional `id` labels each record. Pass an importable
+`--controller MODULE:FACTORY` to `scripts/evaluate_rack_pipette.py`. The factory
+receives the joint names, limits, observation slices and control timestep.
+It returns a callable taking `(obs, active_mask)` and returning position
+targets for the batch. The evaluator records one scored episode per row and
+offers separate development-only and scored-layout planning modes. To
+prepare a plan in the latter mode, the module may define
+`plan_on_scored_layouts(layouts, observation)`. The evaluation layout set and
+planning rule must be specified together when reporting a result.
+
+The native throughput check uses the same registered interfaces. The
+table below is RTX 4090 GPU PhysX data from 90 synchronized,
+camera-free control steps on the nominal rack, including observation and
+event computation.
+
+| Mounted worlds | Batch control steps/s | World control steps/s |
+| ---: | ---: | ---: |
+| 1 | 12.79 | 12.79 |
+| 64 | 9.69 | 620.0 |
+| 512 | 7.54 | 3,861.9 |
+
+```bash
+python tests/native/check_rack_pipette_env.py --headless --assets outputs/cabinet_assets \
+  --num-envs 64 --output outputs/rack_throughput.json
+```
+
 ## Equipment
 
 | Task | Included assets |
