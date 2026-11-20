@@ -45,6 +45,24 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
+        <mesh filename="hanger_tip.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="hanger_middle.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="hanger_root.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
         <mesh filename="collision_geometry_2.obj" scale="1 1 1" />
       </geometry>
     </collision>
