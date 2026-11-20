@@ -68,6 +68,12 @@ RTX 4090 with an X11 display available. Allow several minutes for startup.
 Visual conversion preserves mesh geometry and uses OBJ without the source GLB
 textures.
 
+**Native press check.** Run this after preparing the asset cache. A floating DG-5F presses an aligned pipette whose body is clamped over the tube. The four worlds exercise a full press, a 14 mm lateral miss, an early release and a shallow stroke. Pickup and transport require a separate free-body run.
+
+```bash
+python tests/native/check_floating_press.py --assets outputs/cabinet_assets
+```
+
 ## Equipment
 
 | Task | Included assets |
