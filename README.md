@@ -1,10 +1,8 @@
 # Genesis Sim — wet-lab sandbox
 
 One LabUtopia room with its original benches, Galbot, and equipment for five
-mobile-manipulation tasks. Runs on **Isaac Sim 6.1**; Isaac Lab scene configuration
-is retained for future training. The current scope is asset readiness and physical
-inspection. Successful robot trajectories, trained policies, and vectorized
-training are not qualified.
+mobile-manipulation tasks. The pipette task also provides vectorized Isaac Lab
+environments for mounted and floating hands.
 
 ![Wet-lab overview](assets/previews/overview.png)
 
@@ -15,7 +13,17 @@ spring-return Gilson pipette, and a test tube. Choose `--robot mounted` (DexMate
 `--robot floating` (floating DG-5F), or `--robot vega` (handless DexMate for
 robot and scene inspection).
 
-Use Isaac Sim 6.1, Isaac Lab 3 and an NVIDIA GPU. Set up a new asset cache once
+Use Isaac Sim 6.1, Isaac Lab 3 and an NVIDIA GPU. A fresh Python 3.12 conda
+environment can be prepared with the following pinned packages.
+
+```bash
+conda create -n genesis-sim -c conda-forge python=3.12 pip
+conda activate genesis-sim
+python -m pip install torch==2.11.0 torchvision==0.26.0 torchaudio==2.11.0 --index-url https://download.pytorch.org/whl/cu128
+python -m pip install 'isaaclab[isaacsim,importers]==3.0.0rc1' 'isaacsim==6.1.0.0' --extra-index-url https://pypi.nvidia.com
+```
+
+Set up a new asset cache once
 with `--prepare`, then reuse it. The converter preserves the hand collision
 pieces, authors pair exclusions, and supplies positive inertias for the six
 floating-hand virtual links. When upgrading an older cache, run `--prepare` in a new directory to include the current visual meshes and the pipette’s refined hanger collider.
@@ -121,11 +129,40 @@ JSON. An optional `id` labels each record. Pass an importable
 `--controller MODULE:FACTORY` to `scripts/evaluate_rack_pipette.py`. The factory
 receives the joint names, limits, observation slices and control timestep.
 It returns a callable taking `(obs, active_mask)` and returning position
-targets for the batch. The evaluator records one scored episode per row and
-offers separate development-only and scored-layout planning modes. To
-prepare a plan in the latter mode, the module may define
-`plan_on_scored_layouts(layouts, observation)`. The evaluation layout set and
-planning rule must be specified together when reporting a result.
+targets for the batch. The evaluator records one episode per supplied row and
+reports component counts and rates, success counts and rates, and per-layout
+outcomes. Callers choose how to plan, evaluate, and select layouts.
+
+For a minimal evaluator smoke test, create one nominal layout and a controller
+that holds the reset joint positions. Run this from the repository root after
+preparing the assets above.
+
+```bash
+mkdir -p outputs
+python - <<'PY'
+import json
+from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
+
+layout = PipetteLayout(randomize=False)
+with open('outputs/nominal_layouts.json', 'w') as stream:
+    json.dump([{'id': 'nominal', 'rack': layout.rack, 'tube': layout.tube}], stream)
+PY
+cat > outputs/hold_controller.py <<'PY'
+def make_controller(spec):
+    joints = spec['observation_slices']['robot_joint_pos']
+    target = None
+    def hold(obs, active):
+        nonlocal target
+        if target is None:
+            target = obs['policy'][:, joints].clone()
+        return target
+    return hold
+PY
+PYTHONPATH=outputs python scripts/evaluate_rack_pipette.py --headless \
+  --assets outputs/cabinet_assets --layouts outputs/nominal_layouts.json \
+  --controller hold_controller:make_controller --robot mounted \
+  --output outputs/evaluation.json
+```
 
 The native throughput check uses the same registered interfaces. The
 table below is RTX 4090 GPU PhysX data from 90 synchronized,

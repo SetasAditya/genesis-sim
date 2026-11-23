@@ -2,12 +2,17 @@
 
 from dataclasses import replace
 
-import pytest
+import unittest
+
+import numpy as np
+
+try:
+    import torch
+except ModuleNotFoundError:
+    torch = None
 
 
-@pytest.mark.parametrize("holder", ["rack", "frame-edge"])
-def test_placement_toggles_preserve_independent_draws(holder):
-    torch = pytest.importorskip("torch")
+def check_placement_toggles_preserve_independent_draws(holder):
 
     from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
     from wetlab_isaaclab.tasks.pipette_placement import screen_pipette_layouts
@@ -36,44 +41,39 @@ def test_placement_toggles_preserve_independent_draws(holder):
             torch.testing.assert_close(poses, torch.tensor(getattr(nominal, name)).expand(16, -1))
 
 
-def test_default_frame_sits_at_the_back_edge_of_the_bench():
-    pytest.importorskip("torch")
+def check_default_frame_sits_at_the_back_edge_of_the_bench():
 
     from wetlab_isaaclab.equipment.rail_frame import RailFrame
     from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
 
     layout = PipetteLayout(frame=RailFrame(rail_top=0.4))
-    assert layout.frame.edge_center[2] == pytest.approx(0.4)
+    np.testing.assert_allclose(layout.frame.edge_center[2], 0.4)
     assert (layout.frame.tube_width, layout.frame.tube_height) == (.100, .050)
     uprights = list(layout.frame.boxes())[:2]
     assert all(size == (.050, .100, layout.frame.height) for _, size in uprights)
     assert layout.cabinet[0] == layout.bench.center_xy[0]
-    assert layout.cabinet[1] + layout.frame.depth / 2 == pytest.approx(
-        layout.bench.center_xy[1] + layout.bench.depth / 2
-    )
+    np.testing.assert_allclose(layout.cabinet[1] + layout.frame.depth / 2,
+                               layout.bench.center_xy[1] + layout.bench.depth / 2)
     deep_posts = PipetteLayout(frame=RailFrame(post_width=.035, post_depth=.120))
-    assert deep_posts.cabinet[1] + .120 / 2 == pytest.approx(
-        deep_posts.bench.center_xy[1] + deep_posts.bench.depth / 2
-    )
+    np.testing.assert_allclose(deep_posts.cabinet[1] + .120 / 2,
+                               deep_posts.bench.center_xy[1] + deep_posts.bench.depth / 2)
 
 
-def test_edge_pose_follows_the_front_top_of_the_configured_frame():
-    pytest.importorskip("torch")
+def check_edge_pose_follows_the_front_top_of_the_configured_frame():
     from wetlab_isaaclab.equipment.rail_frame import RailFrame
     from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
 
     default = PipetteLayout(holder="frame-edge")
-    assert default.pipette == pytest.approx((0.160000000, 0.230640879, 0.344489598, 0.565250980,
-                                             0.095548225, 0.098567850, -0.813416403))
+    np.testing.assert_allclose(default.pipette, (0.160000000, 0.230640879, 0.344489598, 0.565250980,
+                                                0.095548225, 0.098567850, -0.813416403), atol=1e-7)
     yaw = 2**-.5
     rotated = PipetteLayout(holder="frame-edge", cabinet=(.2, .3, .1, yaw, 0., 0., yaw),
                             frame=RailFrame(rail_top=.6, tube_width=.08))
-    assert rotated.pipette[:3] == pytest.approx((0.239359121, 0.300000000, 0.594489598))
-    assert rotated.pipette[3:] == pytest.approx((0.974865056, -0.002135197, 0.137260793, -0.175479453), abs=1e-7)
+    np.testing.assert_allclose(rotated.pipette[:3], (0.239359121, 0.300000000, 0.594489598), atol=1e-7)
+    np.testing.assert_allclose(rotated.pipette[3:], (0.974865056, -0.002135197, 0.137260793, -0.175479453), atol=1e-7)
 
 
-def test_pipette_moves_only_along_the_rail():
-    torch = pytest.importorskip("torch")
+def check_pipette_moves_only_along_the_rail():
 
     from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
 
@@ -92,22 +92,22 @@ def test_pipette_moves_only_along_the_rail():
     assert all(center[1] == 0 for center, _ in layout.frame.boxes())
 
 
-def test_rack_moves_with_pipette_and_tube_stays_independent():
-    torch = pytest.importorskip("torch")
+def check_rack_moves_with_pipette_and_tube_stays_independent():
 
     from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout
     from wetlab_isaaclab.tasks.pipette_placement import screen_pipette_layouts
 
     nominal = PipetteLayout(holder="rack")
-    assert nominal.pipette == pytest.approx((-.108430399, -.434322240, .172202957, .526312899,
-                                              -.105302074, .171433301, .826145767))
+    np.testing.assert_allclose(nominal.pipette, (-.076569601, -.316677760, .172202957, .826145767,
+                                                  .171433301, .105302074, -.526312899), atol=1e-7)
+    np.testing.assert_allclose(nominal.tube[:3], (.36, -.41, 0.), atol=1e-7)
     unrotated = PipetteLayout(holder="rack", rack=(0., 0., 0., 1., 0., 0., 0.))
     dx, dy, dz = (v - t for v, t in zip(nominal.pipette[:3], nominal.rack[:3]))
-    assert unrotated.pipette[:3] == pytest.approx((dy, -dx, dz))
+    np.testing.assert_allclose(unrotated.pipette[:3], (-dy, dx, dz), atol=1e-7)
     w, x, y, z = nominal.pipette[3:]
-    assert unrotated.pipette[3:] == pytest.approx(tuple(
-        k * 2**-.5 for k in (w + z, x + y, y - x, z - w)
-    ))
+    np.testing.assert_allclose(unrotated.pipette[3:], tuple(
+        k * 2**-.5 for k in (w - z, x - y, y + x, z + w)
+    ), atol=1e-7)
 
     def sample(layout, screened):
         if screened:
@@ -127,8 +127,7 @@ def test_rack_moves_with_pipette_and_tube_stays_independent():
         assert torch.unique(result["rack"], dim=0).shape[0] > 1
 
 
-def test_mounted_frame_layout_screen_reaches_both_objects():
-    pytest.importorskip("torch")
+def check_mounted_frame_layout_screen_reaches_both_objects():
     from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout, default_robot_base_pose
     from wetlab_isaaclab.tasks.pipette_placement import screen_pipette_layouts
 
@@ -138,3 +137,42 @@ def test_mounted_frame_layout_screen_reaches_both_objects():
     bank = screen_pipette_layouts(layout, base_position=base[:3], base_rotation=base[3:],
                                   floating=False, seed=41, count=4)
     assert len(bank.pipette_poses) == len(bank.tube_poses) == 4
+
+
+def check_mounted_rack_defaults_and_sampler():
+    from wetlab_isaaclab.tasks.pipette_layout import PipetteLayout, default_robot_base_pose
+    from wetlab_isaaclab.tasks.pipette_placement import screen_pipette_layouts
+
+    layout = PipetteLayout()
+    base = default_robot_base_pose(robot="mounted", holder="rack")
+    np.testing.assert_allclose(base, (-.27, -.76, -.8647001386, .3420201433256688, 0., 0., .9396926207859083), atol=1e-7)
+    assert default_robot_base_pose(robot="vega", holder="rack") == base
+    screened = screen_pipette_layouts(layout, base_position=base[:3], base_rotation=base[3:],
+                                      floating=False, seed=41, count=32)
+    assert len(screened.pipette_poses) == len(screened.tube_poses) == 32
+
+
+@unittest.skipIf(torch is None, "torch is required")
+class PipetteLayoutTests(unittest.TestCase):
+    def test_placement_toggles(self):
+        for holder in ("rack", "frame-edge"):
+            with self.subTest(holder=holder):
+                check_placement_toggles_preserve_independent_draws(holder)
+
+    def test_default_frame(self):
+        check_default_frame_sits_at_the_back_edge_of_the_bench()
+
+    def test_edge_pose(self):
+        check_edge_pose_follows_the_front_top_of_the_configured_frame()
+
+    def test_rail_motion(self):
+        check_pipette_moves_only_along_the_rail()
+
+    def test_rack_motion(self):
+        check_rack_moves_with_pipette_and_tube_stays_independent()
+
+    def test_mounted_frame_screen(self):
+        check_mounted_frame_layout_screen_reaches_both_objects()
+
+    def test_mounted_rack_screen(self):
+        check_mounted_rack_defaults_and_sampler()

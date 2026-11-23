@@ -77,7 +77,7 @@ def check(args):
             layouts = [dict(id=f"nominal-{index}", rack=env.layout.rack, tube=env.layout.tube)
                        for index in range(env.num_envs)]
             rows = score_rack_layouts(env, layouts, controller_factory=lambda: (lambda obs, mask: home),
-                                      planning="development-only", seed=41)
+                                      seed=41)
             assert all(row["valid"] and row["fixture_stable"] and not row["success"] for row in rows)
             assert all(row["timeout"] and row["control_steps"] == 500 for row in rows)
             result["nominal_no_motion"] = rows

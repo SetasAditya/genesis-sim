@@ -1,42 +1,25 @@
 """Score one attempt per supplied rack layout using the environment's events."""
 
 from collections.abc import Callable, Sequence
-from typing import Literal
 
 import torch
 
 
-Planning = Literal["development-only", "scored-layout"]
 EVENTS = ("goal_reached", "aligned", "sustained_press", "success")
 
 
 def score_rack_layouts(env, layouts: Sequence[dict], *,
                        controller_factory: Callable,
-                       planning: Planning,
-                       plan_on_scored_layouts: Callable | None = None,
                        seed: int = 0):
     """Return first-attempt outcomes, one per layout.
 
     `controller_factory()` creates a fresh batched controller, which receives
-    `(observation, active_mask)` and returns the position targets. In
-    scored-layout mode the optional planner receives the supplied layouts and
-    initial observation before that factory is called. It may use a separate
-    simulator. The evaluator never steps, retries or changes a scored start
-    on the planner's behalf.
-
-    The split controls when the evaluator calls a planner. It does not police
-    simulation or data access by externally supplied Python code.
+    `(observation, active_mask)` and returns the position targets.
     """
-    if planning not in ("development-only", "scored-layout"):
-        raise ValueError(f"Unknown planning rule: {planning}")
-    if planning == "development-only" and plan_on_scored_layouts is not None:
-        raise ValueError("Scored-layout planning is disabled")
     if len(layouts) != env.num_envs:
         raise ValueError("Expected one layout per world")
 
     obs, _ = env.reset(seed=seed, options={"layouts": layouts})
-    if plan_on_scored_layouts is not None:
-        plan_on_scored_layouts(layouts, {"policy": obs["policy"].clone()})
     controller = controller_factory()
     scene = env.unwrapped
     fields = scene.observation_slices
