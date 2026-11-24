@@ -19,7 +19,7 @@ def default_robot_base_pose(
     if robot == "floating":
         return (-.18, -.64, .32, 1., 0., 0., 0.)
     if holder == "rack":
-        return (-.27, -.76, -.8647001386, .3420201433256688, 0., 0., .9396926207859083)
+        return (.03, -.95, -.8647001386, 2**-0.5, 0., 0., -2**-0.5)
     return (-.20, -.75, -.8647001386, 0., 0., 0., 1.)
 
 
@@ -31,7 +31,7 @@ class PipetteLayout:
     pipette: Pose | None = None
     tube: Pose | None = None
     holder: Literal["frame-edge", "rack"] = "rack"
-    rack: Pose = (-0.075, -0.351, 0., 2**-0.5, 0., 0., -2**-0.5)
+    rack: Pose = (0.03, -0.20, 0., 2**-0.5, 0., 0., -2**-0.5)
     randomize: bool = True
     randomize_pipette: bool = True
     randomize_tube: bool = True
@@ -54,9 +54,10 @@ class PipetteLayout:
             back = y + (self.bench.depth - self.frame.depth) / 2
             object.__setattr__(self, "cabinet", (x, back, 0., 1., 0., 0., 0.))
         if self.tube is None:
-            # Provide space for the rack and its placement range on the left.
-            xy = (0.36, -0.41) if self.holder == "rack" else (0.15535563, -0.39385803)
-            object.__setattr__(self, "tube", (*xy, 0., 0.98822186, 0., 0., -0.15302796))
+            if self.holder == "rack":
+                object.__setattr__(self, "tube", (-.39, -.20, 0., 1., 0., 0., 0.))
+            else:
+                object.__setattr__(self, "tube", (0.15535563, -0.39385803, 0., 0.98822186, 0., 0., -0.15302796))
         if self.pipette is not None:
             return
         holder_pose = self.cabinet if self.holder == "frame-edge" else self.rack

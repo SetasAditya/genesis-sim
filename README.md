@@ -115,6 +115,11 @@ absolute joint positions in `env.joint_names` order, in radians or metres.
 Object positions are relative to each bench's environment origin, orientations
 are XYZW, velocities use SI units and axial force is in newtons.
 
+The default mounted robot faces the centered rack from the front of the bench;
+the tube sits to its left. Pass `layout=PipetteLayout(...)` to configure the
+holder and tube and `base_pose=(x, y, z, w, qx, qy, qz)` to place the robot.
+The base quaternion must be normalized.
+
 Each control advances five 10 ms physics steps. A native validity failure or
 the shared success event terminates an episode. The 500-step time limit
 truncates it. Success yields a reward of 1. Done rows use Isaac Lab same-step

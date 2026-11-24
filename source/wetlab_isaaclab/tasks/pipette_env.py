@@ -1,6 +1,7 @@
 """Vectorized Gymnasium interface for the rack pipette task."""
 
 from dataclasses import replace
+import math
 from pathlib import Path
 
 import gymnasium as gym
@@ -26,7 +27,7 @@ class RackPipetteEnv(DirectRLEnv):
     """
 
     def __init__(self, *, assets, robot_kind="mounted", num_envs=1, device="cuda:0",
-                 seed=0, layout=None, render_mode=None):
+                 seed=0, layout=None, render_mode=None, base_pose=None):
         if robot_kind not in ("mounted", "floating"):
             raise ValueError(f"Unsupported rack robot: {robot_kind}")
         if num_envs < 1:
@@ -42,7 +43,11 @@ class RackPipetteEnv(DirectRLEnv):
         layout = PipetteLayout() if layout is None else layout
         if layout.holder != "rack":
             raise ValueError("The rack benchmark requires holder='rack'")
-        base = default_robot_base_pose(robot=robot_kind, holder="rack")
+        base = default_robot_base_pose(robot=robot_kind, holder="rack") if base_pose is None else tuple(base_pose)
+        if len(base) != 7 or not all(math.isfinite(x) for x in base):
+            raise ValueError("base_pose must be finite xyz+wxyz")
+        if abs(sum(x*x for x in base[3:]) - 1) > 1e-5:
+            raise ValueError("base_pose quaternion must be normalized")
         if layout.randomize:
             layout = screen_pipette_layouts(
                 layout, base_position=base[:3], base_rotation=base[3:],

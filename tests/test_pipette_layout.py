@@ -98,9 +98,9 @@ def check_rack_moves_with_pipette_and_tube_stays_independent():
     from wetlab_isaaclab.tasks.pipette_placement import screen_pipette_layouts
 
     nominal = PipetteLayout(holder="rack")
-    np.testing.assert_allclose(nominal.pipette, (-.076569601, -.316677760, .172202957, .826145767,
+    np.testing.assert_allclose(nominal.pipette, (.028430399, -.165677760, .172202957, .826145767,
                                                   .171433301, .105302074, -.526312899), atol=1e-7)
-    np.testing.assert_allclose(nominal.tube[:3], (.36, -.41, 0.), atol=1e-7)
+    np.testing.assert_allclose(nominal.tube[:3], (-.39, -.20, 0.), atol=1e-7)
     unrotated = PipetteLayout(holder="rack", rack=(0., 0., 0., 1., 0., 0., 0.))
     dx, dy, dz = (v - t for v, t in zip(nominal.pipette[:3], nominal.rack[:3]))
     np.testing.assert_allclose(unrotated.pipette[:3], (-dy, dx, dz), atol=1e-7)
@@ -145,7 +145,9 @@ def check_mounted_rack_defaults_and_sampler():
 
     layout = PipetteLayout()
     base = default_robot_base_pose(robot="mounted", holder="rack")
-    np.testing.assert_allclose(base, (-.27, -.76, -.8647001386, .3420201433256688, 0., 0., .9396926207859083), atol=1e-7)
+    np.testing.assert_allclose(base, (.03, -.95, -.8647001386, 2**-.5, 0., 0., -2**-.5), atol=1e-7)
+    np.testing.assert_allclose(layout.rack, (.03, -.20, 0., 2**-.5, 0., 0., -2**-.5), atol=1e-7)
+    np.testing.assert_allclose(layout.tube, (-.39, -.20, 0., 1., 0., 0., 0.), atol=1e-7)
     assert default_robot_base_pose(robot="vega", holder="rack") == base
     screened = screen_pipette_layouts(layout, base_position=base[:3], base_rotation=base[3:],
                                       floating=False, seed=41, count=32)
